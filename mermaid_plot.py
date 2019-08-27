@@ -68,6 +68,16 @@ def max_UTC(UTC_list, ind=False):
     :return: latest UTCDateTime stamp. If ind is True, tuple of (latest time
              stamp, index) is output.
 
+    Usage:
+
+        .. code-block:: python
+
+            from mermaid_plot import max_UTC
+
+            # Assuming you have a list of UTCDateTimes
+            most_recent_UTC = max_UTC(<some_UTCDatetime_list>)
+
+
     """
 
     counter = 0
@@ -95,6 +105,15 @@ def min_UTC(UTC_list, ind=False):
     :return: earliest UTCDateTime stamp. If ind is True, tuple of (earliest time
              stamp, index) is output.
 
+    Usage:
+
+        .. code-block:: python
+
+            from mermaid_plot import max_UTC
+
+            # Assuming you have a list of UTCDateTimes
+            oldest_UTC = min_UTC(<some_UTCDatetime_list>)
+
     """
 
     counter = 0
@@ -115,7 +134,24 @@ def min_UTC(UTC_list, ind=False):
 
 def get_coordinates_from_kml_path(kml_file):
     """Reads .kml file and returns corresponding latitude and longitude
-    lists. WARNING!!! Only works for kmls with a single path!"""
+    lists. WARNING!!! Only works for kmls with a single path!
+
+    :param kml_file: path/to/kml_file
+    :type kml_file: str
+    :returns: tuple with list of latitudes and list longitudes
+
+    Usage:
+
+        .. code-block:: python
+
+            # KML file
+            kml_file = "<path/to/kml_file>"
+
+            # Get lats, lons
+            lat, lon = get_coordinates_from_kml_path(kml_file)
+
+
+    """
 
     # Read kml file
     kml = open(kml_file, 'r').read()
@@ -159,7 +195,8 @@ def get_coordinates_from_kml_path(kml_file):
     return latitudes, longitudes
 
 
-def get_positions(vital_file, begin, end):
+def get_positions(vital_file, begin=UTCDateTime("2000-01-01T00:00:00"),
+                  end=UTCDateTime("2100-01-01T00:00:00")):
     """ Reads vital file and the gps coordinates in it.
 
     :param vital_file: path/to/your_float.vit
@@ -167,6 +204,18 @@ def get_positions(vital_file, begin, end):
     :param end: UTCDatetime with end of gps positions
 
     :return: tuple of three lists (dates, latitudes, longitudes)
+
+    Usage:
+
+        .. code-block:: python
+
+            # Vital file
+            vit_file = "<path/to/<your_vital_file>.vit>"
+
+            # Get lats, lons
+            mermaid_name, dates, latitudes, longitudes = \
+                get_positions(vit_file, begin=UTCDateTime(<sometime>)
+                              end=UTCDateTime(<sometime_later>))
 
     """
 
@@ -784,5 +833,6 @@ class MermaidLocations(object):
 
 
 if __name__ == "__main__":
-    print("This function is only called by python binaries.")
+    print("This function is only called by python binaries or imported"
+          "imported externally")
 
