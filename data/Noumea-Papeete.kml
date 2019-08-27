@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+<Document>
+	<name>Noumea-Papeete.kml</name>
+	<Style id="inline02">
+		<LineStyle>
+			<color>ff00ffff</color>
+			<width>2</width>
+		</LineStyle>
+		<PolyStyle>
+			<fill>0</fill>
+		</PolyStyle>
+	</Style>
+	<StyleMap id="inline30">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#inline31</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#inline02</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Style id="inline31">
+		<LineStyle>
+			<color>ff00ffff</color>
+			<width>2</width>
+		</LineStyle>
+		<PolyStyle>
+			<fill>0</fill>
+		</PolyStyle>
+	</Style>
+	<Placemark>
+		<name>Noumea-Papeete</name>
+		<styleUrl>#inline30</styleUrl>
+		<LineString>
+			<tessellate>1</tessellate>
+			<coordinates>
+				167.0745751098281,-22.46850116520729,0 179.5230655281705,-14.43215905110993,0 183.0630734092497,-14.00274685734797,0 187.9675555237115,-12.01930730594055,0 191.617444732892,-12.12621251528997,0 194.1606724160255,-14.101620607769,0 200.4291705292264,-14.0588732075213,0 204.9431471691458,-14.98902012466153,0 210.529409954947,-17.54861455384083,0 
+			</coordinates>
+		</LineString>
+	</Placemark>
+</Document>
+</kml>

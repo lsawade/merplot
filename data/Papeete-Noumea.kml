@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+<Document>
+	<name>Papeete-Nouméa_Atalante-2019.kml</name>
+	<Style id="inline01">
+		<LineStyle>
+			<color>ff00ff00</color>
+			<width>2</width>
+		</LineStyle>
+		<PolyStyle>
+			<fill>0</fill>
+		</PolyStyle>
+	</Style>
+	<Style id="inline2">
+		<LineStyle>
+			<color>ff00ff00</color>
+			<width>2</width>
+		</LineStyle>
+		<PolyStyle>
+			<fill>0</fill>
+		</PolyStyle>
+	</Style>
+	<StyleMap id="inline61">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#inline01</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#inline2</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Placemark>
+		<name>Papeete-Nouméa_Atalante-2019</name>
+		<open>1</open>
+		<styleUrl>#inline61</styleUrl>
+		<LineString>
+			<tessellate>1</tessellate>
+			<coordinates>
+				-149.5415397474597,-17.53120480785299,0 -150.9998670116629,-12.00744210674937,0 -150.0109733237474,-9.998924397273203,0 -148.9918522735911,-7.98185143492605,0 -147.9957786661817,-5.983634479254147,0 -146.0008915730748,-4.981540940957116,0 -143.9915873898479,-5.984782388043084,0 -140.0206175568841,-7.24114339850421,0 -136.00181323469,-11.59666800086484,0 -134.8058307330788,-15.29768620502393,0 -140.9929670274452,-22.02235505419448,0 -149.0226692898792,-26.98836476873664,0 -151.0035865101797,-27.99326785286618,0 -153.3935408668762,-28.60869272615998,0 -155.588648952445,-29.41904326326767,0 -160.0108931733305,-31.0130164693209,0 -164.0152308679465,-29.99355234535156,0 -166.0095962724182,-28.98071370676229,0 -167.9873164188841,-27.98275924691391,0 -169.9759971093806,-26.9833258951175,0 -172.017166608153,-25.97298922216807,0 -174.9295649535546,-25.66333362265601,0 -177.601690810432,-25.6280646961712,0 -178.9620830161473,-25.0168003771149,0 180.0239289885766,-24.59479066578512,0 -192.7497418188297,-22.79600944890221,0 166.8401137821571,-22.3879403895325,0 
+			</coordinates>
+		</LineString>
+	</Placemark>
+</Document>
+</kml>
