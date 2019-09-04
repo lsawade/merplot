@@ -36,6 +36,9 @@ from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter
 from matplotlib.collections import LineCollection
 import matplotlib.pyplot as plt
 
+import matplotlib
+
+
 
 #--------- This is necessary for round caps in the line collection-------------
 """
@@ -409,13 +412,15 @@ class MermaidLocations(object):
     def __init__(self, latitudes, longitudes, times=None, mermaid_names=None,
                 lon_ticks=[160.0, 180.0, -180.0, -160.0, -140.0, -120.0,
                            -100.0],
-                lat_ticks=[-40.0, -20.0, 0.0, 20.0],
-                minlon=160.0, maxlon=255.0, minlat=-37.5, maxlat=5.0,
+                lat_ticks=[-60, -40.0, -20.0, 0.0, 20.0],
+                minlon=160.0, maxlon=255.0, minlat=-42.5, maxlat=5.0,
                 central_longitude=180.0,
-                mermaid_markersize=25, markerfontsize=None,
+                mermaid_markersize=30, markerfontsize=None,
+                legend=True, legend_cols=1, legend_title=None,
+                fontsize=14,
                 plot_labels=True,
                 trajectories=True,
-                trajectory_width=4,
+                trajectory_width=8,
                 trajectory_cmp="gist_heat",
                 wms=False, wms_url=None, wms_layer=None,
                 figsize=(15, 8)):
@@ -455,6 +460,14 @@ class MermaidLocations(object):
         :type end: UTCDateTime
         :param mermaid_markersize: Markersize for the Mermaid markers
         :type mermaid_markersize: float or int
+        :param legend: Plot legend of map content
+        :type legend: bool
+        :param legend_cols: Number of columns in the legend. Default 1
+        :type legend_cols: int
+        :param legend_title: Some title. Default None
+        :type legend_title: str
+        :param fontsize: General fontsize for the figure
+        :type fontsize: float or int
         :param plot_labels: Plot labels of the mermaid number onto the
                                markers
         :type plot_labels: bool
@@ -493,6 +506,12 @@ class MermaidLocations(object):
 
         # Figure size
         self.figsize = figsize
+
+        # General Map Stuff
+        self.legend = legend
+        self.legend_cols = legend_cols
+        self.legend_title = legend_title
+        self.fontsize = fontsize
 
         # MapBorders
         self.central_longitude = central_longitude
@@ -589,14 +608,21 @@ class MermaidLocations(object):
             self.times_s.append(new_row)
 
     def add_aux_data(self, lon, lat, **kwargs):
-        """ Adding auxiliary data. """
+        """  Adding auxiliary data.
+
+        :param lon: Longitudes
+        :type lon: float or list of floats
+        :param lat: Latitudes
+        :type lon: float or list of floats
+        :param kwargs: keyword arguments for matplotlib functions
+        :return:
+        """
 
         if self.auxiliary_data is None:
             self.auxiliary_data = []
 
         # Create empty dictionary
         data_dict = dict()
-
 
         data_dict["lon"] = lon
         data_dict["lat"] = lat
@@ -605,8 +631,10 @@ class MermaidLocations(object):
         # Add data to data list
         self.auxiliary_data.append(data_dict)
 
-    def plot(self):
-        """Plots everything"""
+    def plot(self, f=None, **kwargs):
+        """Plots everything
+        :param f: Filename. No plot will be diplayed, but a file will be
+        generated."""
 
         # Plot background map
         self.plot_map()
@@ -623,8 +651,35 @@ class MermaidLocations(object):
         # Plot colorbar
         self.activate_colorbar()
 
-        # Show stuff
-        plt.show(block=True)
+        # Plot legend if wanted
+        self.plot_legend()
+
+        if f is not None:
+            # Save figure
+            plt.savefig(f, bbox_inches='tight', **kwargs)
+        else:
+            # Show stuff
+            plt.show(block=True)
+
+    def plot_legend(self):
+        """Plots legend with the given parameters"""
+
+        # Set up dictionary with legend setup properties
+        legend_props = {"loc": 'lower right',
+                        "ncol": self.legend_cols,
+                        "edgecolor": "k",
+                        "fancybox": False,
+                        "framealpha": 1,
+                        "fontsize": self.fontsize}
+
+        # Plot legend if wanted
+        if self.legend:
+            l = plt.legend(**legend_props)
+
+            if self.legend_title is not None:
+                font_dict = {"weight": "bold"}
+                l.set_title(self.legend_title, prop=font_dict)
+
 
     def plot_map(self):
         """Plots the background map for float visualization and sets the
@@ -653,6 +708,14 @@ class MermaidLocations(object):
         # Set ticklabels
         self.ax.set_xticks(self.lon_ticks, crs=ccrs.PlateCarree())
         self.ax.set_yticks(self.lat_ticks, crs=ccrs.PlateCarree())
+
+        # Change fontsize
+        font_dict = {"fontsize": self.fontsize,
+                     "weight": "bold"}
+        self.ax.set_xticklabels(self.ax.get_xticklabels(), fontdict=font_dict)
+        self.ax.set_yticklabels(self.ax.get_yticklabels(), fontdict=font_dict)
+
+        # Change format
         lon_formatter = LongitudeFormatter(zero_direction_label=True)
         lat_formatter = LatitudeFormatter()
         self.ax.xaxis.set_major_formatter(lon_formatter)
@@ -663,7 +726,8 @@ class MermaidLocations(object):
 
         # Get WMS map if wanted
         if self.wms:
-            self.ax.add_wms(self.wms_url, self.wms_layer)
+            self.ax.add_wms(self.wms_url, self.wms_layer, resample=True,
+                            interpolation='spline36')
         else:
             self.ax.stock_img()
             self.ax.add_feature(cfeature.LAND, zorder=10)
@@ -692,20 +756,29 @@ class MermaidLocations(object):
         # Loop over mermaids
         for _i, (lat, lon, t) in enumerate(zip(self.latitudes, self.longitudes,
                                                self.times_s)):
-
-            # Calling function to plot one trajectory.
-            lc = self._plot_1_traj( _i, lat, lon, t,
-                                    self.first_time,
-                                    self.last_time,
-                                    self.end_points,
-                                    self.trajectory_width,
-                                    self.trajectory_cmap)
+            if _i == 0:
+                # Calling function to plot one trajectory with label
+                lc = self._plot_1_traj( _i, lat, lon, t,
+                                        self.first_time,
+                                        self.last_time,
+                                        self.end_points,
+                                        self.trajectory_width,
+                                        self.trajectory_cmap,
+                                        label="Trajectory")
+            else:
+                # Calling function to plot one trajectory without label
+                lc = self._plot_1_traj(_i, lat, lon, t,
+                                       self.first_time,
+                                       self.last_time,
+                                       self.end_points,
+                                       self.trajectory_width,
+                                       self.trajectory_cmap)
 
             self.ax.add_collection(lc)
 
     @staticmethod
     def _plot_1_traj(_i, lat, lon, t, first_time, last_time,
-                     end_points, line_width, cmap):
+                     end_points, line_width, cmap, **kwargs):
         """This function computes one trajectory for a given set of lats,
         lons. and times, as well as the first and last time of all
         trajectories in seconds, line width, cmap.
@@ -788,11 +861,19 @@ class MermaidLocations(object):
         # Plot Mermaid Locations
         for _i, (lat, lon) in enumerate(zip(self.latitudes, self.longitudes)):
 
-            # Mermaid Marker
-            plot_point(lon[-1], lat[-1], markersize=self.mermaid_markersize,
-                       marker=mermaid_verts,
-                       markeredgecolor='k', markerfacecolor='orange',
-                       zorder=150)
+            # Add label for one Mermaid.
+            if _i == 0:
+                # Mermaid Marker with label
+                plot_point(lon[-1], lat[-1], markersize=self.mermaid_markersize,
+                           marker=mermaid_verts,
+                           markeredgecolor='k', markerfacecolor='orange',
+                           zorder=150, label="Mermaid")
+            else:
+                # Mermaid Marker
+                plot_point(lon[-1], lat[-1], markersize=self.mermaid_markersize,
+                           marker=mermaid_verts,
+                           markeredgecolor='k', markerfacecolor='orange',
+                           zorder=150)
 
             if self.plot_labels:
                 plot_text(self.mermaid_names[_i], lon[-1], lat[-1],
@@ -816,7 +897,7 @@ class MermaidLocations(object):
 
 
     def activate_colorbar(self):
-        """This activates the colorbar. """\
+        """This activates the colorbar. """
 
         # Calling function to plot one trajectory.
         lc = self._plot_1_traj(0, self.latitudes[0], self.longitudes[0],
@@ -827,8 +908,35 @@ class MermaidLocations(object):
                                self.trajectory_width,
                                self.trajectory_cmap)
 
-        axcb = self.fig.colorbar(lc)
-        axcb.set_label('seconds (s)')
+        # Get max time extent
+        maxt = self.last_time - self.first_time
+
+        # Set marks at 5 positions
+        ticks = [0]
+        for tick in [1, 2, 3, 4]:
+            # Get tick
+            ticks.append(tick * maxt / 4)
+
+
+        labels = []
+        for tick in ticks:
+            # Get label
+            time = (self.last_time - tick).isoformat().split(".")[0].split("T")
+            label = "Date: %s\nTime: %s" % (time[0], time[1])
+            labels.append(label)
+
+        # Create colorbar
+        cb = self.fig.colorbar(lc, ticks=ticks, shrink=0.85, aspect=35)
+
+        # Set labels
+        # Change fontsize
+        cb.set_ticklabels(labels)
+
+        for l in cb.ax.yaxis.get_ticklabels():
+            l.set_fontsize(self.fontsize)
+
+        cb.set_label('  UTC', rotation="horizontal", fontsize=self.fontsize,
+                       horizontalalignment="left", fontweight="bold")
 
 
 

@@ -39,8 +39,20 @@ if __name__ == "__main__":
                         type=str, nargs='+')
     args = parser.parse_args()
 
+    # Legend title
+
+    # wms setup
+    wms = True
+    wms_url = 'https://ahocevar.com/geoserver/wms'
+    wms_layer = 'ne:NE1_HR_LC_SR_W_DR'
+
     # Run
-    ML = MermaidLocations.from_vit_file(args.filelist)
+    ML = MermaidLocations.from_vit_file(args.filelist, minlat=-42.5,
+                                        legend_cols=1, legend_title="SPPIM",
+                                        trajectory_width=6,
+                                        wms=wms, wms_url=wms_url,
+                                        wms_layer=wms_layer,
+                                        figsize=(30, 8), fontsize=14)
 
     # Get paths to auxiliary data
     pp_path = os.path.join(data_path, "Papeete-Papeete.kml")
@@ -53,9 +65,29 @@ if __name__ == "__main__":
     np_lat, np_lon = get_coordinates_from_kml_path(np_path)
 
     # Add ship paths
-    ML.add_aux_data(pp_lon, pp_lat, color="r", linewidth=2.5)
-    ML.add_aux_data(pn_lon, pn_lat, color="g", linewidth=2.5)
-    ML.add_aux_data(np_lon, np_lat, color="y", linewidth=2.5)
+    ML.add_aux_data(np_lon, np_lat, color="y", linewidth=2.5,
+                    label="Nouméa-Pape'ete - Jun/Jul '18")
+    ML.add_aux_data(pp_lon, pp_lat, color="r", linewidth=2.5,
+                    label="Pape'ete-Pape'ete - Aug '18")
+    ML.add_aux_data(pn_lon, pn_lat, color="g", linewidth=2.5,
+                    label="Pape'ete-Nouméa - Aug '19")
+
+    # Pape'ete
+    p_lon = -149.5585
+    p_lat = -17.5516
+
+    # Nouméa
+    n_lon = 166.4416
+    n_lat = -22.2711
+
+    # Add Papeete and Noume markers
+    ML.add_aux_data(p_lon, p_lat, linestyle="None", marker="o", markersize=7,
+                    markeredgecolor='k', markerfacecolor='r', zorder=200)
+    # Add Papeete and Noume markers
+    ML.add_aux_data(n_lon, n_lat, linestyle="None", marker="o", markersize=7,
+                    markeredgecolor='k', markerfacecolor='r', zorder=200)
 
     # Plot
+    # ML.plot(f="mermaidplot.svg", dpi=300, papertype="a4")
+    # ML.plot(f="mermaidplot.svg", dpi=300)
     ML.plot()
