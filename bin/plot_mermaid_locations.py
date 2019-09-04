@@ -42,12 +42,12 @@ if __name__ == "__main__":
     # Legend title
 
     # wms setup
-    wms = True
+    wms = False
     wms_url = 'https://ahocevar.com/geoserver/wms'
     wms_layer = 'ne:NE1_HR_LC_SR_W_DR'
 
     # Run
-    ML = MermaidLocations.from_vit_file(args.filelist, minlat=-42.5,
+    ML = MermaidLocations.from_vit_file(args.filelist, minlat=-45,
                                         legend_cols=1, legend_title="SPPIM",
                                         trajectory_width=6,
                                         wms=wms, wms_url=wms_url,
@@ -80,14 +80,34 @@ if __name__ == "__main__":
     n_lon = 166.4416
     n_lat = -22.2711
 
-    # Add Papeete and Noume markers
+    # Shimizu
+    s_lon = 138.50
+    s_lat = 35.00
+
+    # Valparaíso
+    v_lon = -71.63
+    v_lat = -33.37
+
+    # Add Noumea marker
     ML.add_aux_data(p_lon, p_lat, linestyle="None", marker="o", markersize=7,
                     markeredgecolor='k', markerfacecolor='r', zorder=200)
-    # Add Papeete and Noume markers
+    # Add Papeete marker
     ML.add_aux_data(n_lon, n_lat, linestyle="None", marker="o", markersize=7,
                     markeredgecolor='k', markerfacecolor='r', zorder=200)
+    # Shimizu marker
+    ML.add_aux_data(s_lon, s_lat, linestyle="None", marker="o", markersize=7,
+                    markeredgecolor='k', markerfacecolor='r', zorder=200)
+    # Valparaíso marker
+    ML.add_aux_data(v_lon, v_lat, linestyle="None", marker="o", markersize=7,
+                    markeredgecolor='k', markerfacecolor='r', zorder=200)
+
+    # Shimizu - Valparaíso Dec ’18 - Jan ‘19 ship track
+    ML.add_aux_data([s_lon, v_lon], [s_lat, v_lat], color="b", linewidth=2.5,
+                    label="Shimizu-Valparaíso - Dec/Jan ’18/‘19")
 
     # Plot
     # ML.plot(f="mermaidplot.svg", dpi=300, papertype="a4")
     # ML.plot(f="mermaidplot.svg", dpi=300)
     ML.plot()
+
+    # ML.animate()

@@ -16,7 +16,8 @@ Last Update:
 
 import re
 import os
-
+import sys
+import time
 # I think there is probably a matplotlib function with date time, if I can
 # find out about that, I can write a simple vincenty formula for
 # locations2degree. If I just prepend it to the code and call it the same the
@@ -35,7 +36,7 @@ import matplotlib.ticker as mticker
 from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter
 from matplotlib.collections import LineCollection
 import matplotlib.pyplot as plt
-
+import matplotlib.animation as animation
 import matplotlib
 
 
@@ -413,7 +414,7 @@ class MermaidLocations(object):
                 lon_ticks=[160.0, 180.0, -180.0, -160.0, -140.0, -120.0,
                            -100.0],
                 lat_ticks=[-60, -40.0, -20.0, 0.0, 20.0],
-                minlon=160.0, maxlon=255.0, minlat=-42.5, maxlat=5.0,
+                minlon=160.0, maxlon=260.0, minlat=-42.5, maxlat=5.0,
                 central_longitude=180.0,
                 mermaid_markersize=30, markerfontsize=None,
                 legend=True, legend_cols=1, legend_title=None,
@@ -423,6 +424,7 @@ class MermaidLocations(object):
                 trajectory_width=8,
                 trajectory_cmp="gist_heat",
                 wms=False, wms_url=None, wms_layer=None,
+                frames=100,
                 figsize=(15, 8)):
         """
 
@@ -486,6 +488,9 @@ class MermaidLocations(object):
         :type wms_url: str
         :param wms_layer: Name of the requested layer.
         :type wms_layer: str
+        :param frames: If animation is wanted the frame number can be set
+                       with this kwarg.
+        :type frames: int
         :param figsize: Define the figure size (Width, Height)
         :type figsize: tuple
         :return: MermaidLocation object.
@@ -531,6 +536,9 @@ class MermaidLocations(object):
         self.trajectories = trajectories
         self.trajectory_width = trajectory_width
         self.trajectory_cmap = trajectory_cmp
+
+        # Animation settings
+        self.frames = frames
 
         # WMS settings
         self.wms = wms
@@ -603,8 +611,8 @@ class MermaidLocations(object):
         # Make seconds out of UTCDateTimes
         for _i, rows in enumerate(self.times):
             new_row = []
-            for _j, column in enumerate(rows):
-                new_row.append(self.last_time - column)
+            for _j, time in enumerate(rows):
+                new_row.append(self.last_time - time)
             self.times_s.append(new_row)
 
     def add_aux_data(self, lon, lat, **kwargs):
@@ -633,8 +641,10 @@ class MermaidLocations(object):
 
     def plot(self, f=None, **kwargs):
         """Plots everything
-        :param f: Filename. No plot will be diplayed, but a file will be
-        generated."""
+        :param f: Filename. No plot will be displayed, but a file will be
+                  generated.
+        :param kwargs: Are parsed to pyplot.savefig if `f` is defined and to
+                       plt.show if `f` is `None`"""
 
         # Plot background map
         self.plot_map()
@@ -661,6 +671,159 @@ class MermaidLocations(object):
             # Show stuff
             plt.show(block=True)
 
+    def animate(self, f=None, **kwargs):
+        """Animates the trajectories of the Mermaids...
+
+        """
+
+        # Plotting the basemap
+        self.plot_map()
+
+        # Plot auxiliary data
+        self.plot_aux_data()
+
+        # Plot first markers.
+
+        # activate the colorbar
+        # Will not work right now ....
+        # self.activate_colorbar()
+
+        # Plot legend if wanted
+        self.plot_legend()
+
+        # Plot animation
+        self.plot_animation()
+
+        # Show everything
+        plt.show()
+
+
+    def plot_animation(self):
+        """ Plots animation of the trajectories
+
+        warning::
+
+            This method only works if you have defined the times!
+
+
+            """
+
+        if self.times is None:
+            raise ValueError("You can only plot trajectories if the time "
+                             "stamps are defined! Trajectories without times "
+                             "make no sense, you see ... ?")
+
+        else:
+            self.compute_second_record()
+
+        # As a function of time steps compute time chunks.
+        time_chunks = self._get_time_chunks()
+
+        # Create empty list for trajectories that are too long. Meaning a
+        # list of End points for split trajectories.
+        self.end_points = []
+
+        # Create list of indices for each frame
+        line_collection_list = []
+        segments = []
+        times = []
+
+        for _i in range(self.frames):
+
+            # List of indices for each mermaid of one frame.
+            frame_segments = []
+            frame_times = []
+
+            # Create big line collection for every frame
+            for _j, (lat, lon, t) in enumerate(zip(self.latitudes,
+                                                     self.longitudes,
+                                                     self.times_s)):
+
+                # Get indices within time_chunks
+                ind = np.where((time_chunks[_i][0] <= np.array(t))
+                               & (np.array(t) <= time_chunks[_i][1]))[0]
+
+
+                if len(ind) > 1:
+
+                    # Get picked times
+                    picked_times = np.array(t)[ind]
+
+                    # Get segments and indices
+                    segs, inds = self._get_segments(_i, np.array(lat)[ind],
+                                                    np.array(lon)[ind],
+                                                    self.end_points)
+
+                    # Add to lists.
+                    frame_segments += segs
+                    frame_times += picked_times[inds].tolist()
+
+
+            if len(frame_segments) > 0:
+                # Create line collection and append to LC for each frame
+                lc = self._make_line_collection(np.array([]),
+                                                np.array([]),
+                                                self.first_time,
+                                                self.last_time,
+                                                self.trajectory_cmap,
+                                                self.trajectory_width)
+                #
+                # lc = self._make_line_collection(np.array(frame_segments),
+                #                                 np.array(frame_times),
+                #                                 self.first_time,
+                #                                 self.last_time,
+                #                                 self.trajectory_cmap,
+                #                                 self.trajectory_width)
+                line_collection_list.append(self.ax.add_collection(lc))
+                segments.append(frame_segments)
+                times.append(frame_times)
+            else:
+                line_collection_list.append(None)
+                segments.append(None)
+                times.append(None)
+
+        # for lc in line_collection_list:
+        #     if lc is not None:
+        #         self.ax.add_collection(lc)
+
+        def update(i):
+
+            # Note the -1 index. has been set because the times are reversed
+            # due to previous calculations...
+            if line_collection_list[-i] is not None:
+                line_collection_list[-i].set_segments(np.array(segments[-i]))
+                line_collection_list[-i].set_array(np.array(times[-i]))
+                z = line_collection_list[-i].get_zorder()
+                line_collection_list[-i].set_zorder(z+i)
+
+
+            return (x for x in line_collection_list if x is not None)
+
+        ani = animation.FuncAnimation(self.fig, update,
+                                      frames=np.arange(self.frames)+1,
+                                      interval=1, repeat=False, blit=True,
+                                      init_func=lambda:
+                                      [x for x in line_collection_list
+                                       if x is not None]
+                                      )
+
+    def _get_time_chunks(self):
+        """From the number of frames as well as min/max times the time chunks
+        can be found. The function will return a list of timestamp pairs
+        given in seconds after the minimum time."""
+
+        # Get dt from timespan/frames
+        dt = (self.last_time - self.first_time)/self.frames
+
+        time_chunks = []
+
+        for i in range(self.frames):
+
+            chunk = [i*dt, (i+1)*dt]
+            time_chunks.append(chunk)
+
+        return time_chunks
+
     def plot_legend(self):
         """Plots legend with the given parameters"""
 
@@ -679,7 +842,6 @@ class MermaidLocations(object):
             if self.legend_title is not None:
                 font_dict = {"weight": "bold"}
                 l.set_title(self.legend_title, prop=font_dict)
-
 
     def plot_map(self):
         """Plots the background map for float visualization and sets the
@@ -756,29 +918,19 @@ class MermaidLocations(object):
         # Loop over mermaids
         for _i, (lat, lon, t) in enumerate(zip(self.latitudes, self.longitudes,
                                                self.times_s)):
-            if _i == 0:
-                # Calling function to plot one trajectory with label
-                lc = self._plot_1_traj( _i, lat, lon, t,
-                                        self.first_time,
-                                        self.last_time,
-                                        self.end_points,
-                                        self.trajectory_width,
-                                        self.trajectory_cmap,
-                                        label="Trajectory")
-            else:
-                # Calling function to plot one trajectory without label
-                lc = self._plot_1_traj(_i, lat, lon, t,
-                                       self.first_time,
-                                       self.last_time,
-                                       self.end_points,
-                                       self.trajectory_width,
-                                       self.trajectory_cmap)
+
+            # Create line collection
+            lc = self._plot_1_traj(_i, lat, lon, t,
+                                   self.first_time,
+                                   self.last_time,
+                                   self.end_points,
+                                   self.trajectory_width,
+                                   self.trajectory_cmap)
 
             self.ax.add_collection(lc)
 
-    @staticmethod
-    def _plot_1_traj(_i, lat, lon, t, first_time, last_time,
-                     end_points, line_width, cmap, **kwargs):
+    def _plot_1_traj(self, _i, lat, lon, t, first_time, last_time,
+                     end_points, line_width, cmap):
         """This function computes one trajectory for a given set of lats,
         lons. and times, as well as the first and last time of all
         trajectories in seconds, line width, cmap.
@@ -810,8 +962,34 @@ class MermaidLocations(object):
         lon = np.array(lon)
         t = np.array(t)
 
+        # indices for times of each segment
+        segments, indices = self._get_segments(_i, lat, lon, end_points)
+
+        # Create LineCollection from points
+        lc = self._make_line_collection(segments, t[indices],
+                                       self.first_time, self.last_time,
+                                       self.trajectory_cmap,
+                                       self.trajectory_width)
+
+        return lc
+
+    @staticmethod
+    def _get_segments(_i, lat, lon, end_points):
+        """This function takes in lats and lons, and returns segments for a
+        LineCollection
+
+        :param _i: index for end_point list
+        :type _i: int
+        :param lat: latitudes
+        :type lat: list
+        :param lon: longitudes
+        :type lon: list
+        :param end_points: end_points of trajectories (defining time jumps)
+        :return: tuple with (segments, indices)
+        """
+
         # Create empty lists
-        indeces = []
+        indices = []
         segments = []
 
         # For each point pair in the trajectory of the Mermaid the loop
@@ -825,20 +1003,25 @@ class MermaidLocations(object):
 
             # Only create segment if
             # Segment if distance is smaller than 5 degrees.
-            if dist < 0.55:
+            if dist < 1:
                 segments.append([(lon1, lat1), (lon2, lat2)])
-                indeces.append(_j)
+                indices.append(_j)
             else:
                 end_points.append((_i, lat1, lon1, dist))
 
-        # Create LineCollection from points
-        lc = LineCollection(segments,
+        return segments, indices
+
+    @staticmethod
+    def _make_line_collection(segments, cvals, min_val, max_val, cmap,
+                              line_width, zorder=100):
+
+        lc = LineCollection(segments, cvals,
                             cmap=plt.get_cmap(cmap),
-                            norm=plt.Normalize(0, last_time - first_time),
-                            zorder=100)
+                            norm=plt.Normalize(0, max_val - min_val),
+                            zorder=zorder)
 
         lc.set_transform(ccrs.Geodetic())
-        lc.set_array(t[indeces])
+        lc.set_array(cvals)
         lc.set_linewidth(line_width)
 
         return lc
@@ -867,17 +1050,17 @@ class MermaidLocations(object):
                 plot_point(lon[-1], lat[-1], markersize=self.mermaid_markersize,
                            marker=mermaid_verts,
                            markeredgecolor='k', markerfacecolor='orange',
-                           zorder=150, label="Mermaid")
+                           zorder=125+_i, label="Mermaid")
             else:
                 # Mermaid Marker
                 plot_point(lon[-1], lat[-1], markersize=self.mermaid_markersize,
                            marker=mermaid_verts,
                            markeredgecolor='k', markerfacecolor='orange',
-                           zorder=150)
+                           zorder=125+_i)
 
             if self.plot_labels:
                 plot_text(self.mermaid_names[_i], lon[-1], lat[-1],
-                          lon_offset=0, lat_offset=-0.05, zorder=200,
+                          lon_offset=0, lat_offset=-0.05, zorder=125+_i,
                           horizontalalignment="center",
                           verticalalignment='center',
                           multialignment="center",
@@ -885,7 +1068,36 @@ class MermaidLocations(object):
             else:
                 plot_point(lon[-1], lat[-1], marker="_", markeredgecolor='k',
                            markersize=10/25 * self.mermaid_markersize,
-                           markerfacecolor='k', zorder=151)
+                           markerfacecolor='k', zorder=125+_i)
+
+        for end_point in self.end_points:
+
+            # Check if distance large enough. The value 6 was found by trial
+            # and error. Lower values would have included the 24h tests as
+            # previous posititions, and we don't want those
+            if end_point[3] > 6:
+
+                # Mermaid Marker
+                plot_point(end_point[2], end_point[1],
+                           markersize=self.mermaid_markersize,
+                           marker=mermaid_verts,
+                           markeredgecolor='k', markerfacecolor='orange',
+                           zorder=125+_i)
+
+                if self.plot_labels:
+                    plot_text(self.mermaid_names[end_point[0]],
+                              end_point[2], end_point[1],
+                              lon_offset=0, lat_offset=-0.05, zorder=125+_i,
+                              horizontalalignment="center",
+                              verticalalignment='center',
+                              multialignment="center",
+                              fontsize=self.markerfontsize, fontweight="bold")
+                else:
+                    plot_point(end_point[2], end_point[1],
+                               marker="_", markeredgecolor='k',
+                               markersize=10/25 * self.mermaid_markersize,
+                               markerfacecolor='k', zorder=125+_i)
+
 
     def plot_aux_data(self):
         """Plot data that is added to the class prior to plotting."""
@@ -907,6 +1119,8 @@ class MermaidLocations(object):
                                self.end_points,
                                self.trajectory_width,
                                self.trajectory_cmap)
+
+
 
         # Get max time extent
         maxt = self.last_time - self.first_time
@@ -936,7 +1150,7 @@ class MermaidLocations(object):
             l.set_fontsize(self.fontsize)
 
         cb.set_label('  UTC', rotation="horizontal", fontsize=self.fontsize,
-                       horizontalalignment="left", fontweight="bold")
+                     horizontalalignment="left", fontweight="bold")
 
 
 
