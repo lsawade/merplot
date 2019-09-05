@@ -42,7 +42,7 @@ if __name__ == "__main__":
     # Legend title
 
     # wms setup
-    wms = False
+    wms = True
     wms_url = 'https://ahocevar.com/geoserver/wms'
     wms_layer = 'ne:NE1_HR_LC_SR_W_DR'
 

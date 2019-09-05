@@ -833,22 +833,30 @@ class MermaidLocations(object):
                         "edgecolor": "k",
                         "fancybox": False,
                         "framealpha": 1,
-                        "fontsize": self.fontsize}
+                        "fontsize": self.fontsize-2}
 
         # Plot legend if wanted
         if self.legend:
             l = plt.legend(**legend_props)
 
             if self.legend_title is not None:
-                font_dict = {"weight": "bold"}
+                font_dict = {"weight": "bold",
+                             "size": self.fontsize-2}
                 l.set_title(self.legend_title, prop=font_dict)
 
     def plot_map(self):
         """Plots the background map for float visualization and sets the
         axis and figure properties."""
 
-        # Set projection.
-        proj = ccrs.PlateCarree(self.central_longitude)
+        # Set projection. The fix below is to solve the issu of a badly
+        # resolved Great Circle paths
+        # ------ GC plotting fix -------
+        class PC(ccrs.PlateCarree):
+            @property
+            def threshold(self):
+                return 0.001
+        # ------------------------------
+        proj = PC(self.central_longitude)
 
         self.fig = plt.figure(figsize=self.figsize)
         self.ax = plt.axes(projection=proj)
@@ -1050,25 +1058,25 @@ class MermaidLocations(object):
                 plot_point(lon[-1], lat[-1], markersize=self.mermaid_markersize,
                            marker=mermaid_verts,
                            markeredgecolor='k', markerfacecolor='orange',
-                           zorder=125+_i, label="Mermaid")
+                           zorder=125+_i, label="Mermaid", clip_on=True)
             else:
                 # Mermaid Marker
                 plot_point(lon[-1], lat[-1], markersize=self.mermaid_markersize,
                            marker=mermaid_verts,
                            markeredgecolor='k', markerfacecolor='orange',
-                           zorder=125+_i)
+                           zorder=125+_i, clip_on=True)
 
             if self.plot_labels:
                 plot_text(self.mermaid_names[_i], lon[-1], lat[-1],
                           lon_offset=0, lat_offset=-0.05, zorder=125+_i,
-                          horizontalalignment="center",
+                          clip_on=True, horizontalalignment="center",
                           verticalalignment='center',
                           multialignment="center",
                           fontsize=self.markerfontsize, fontweight="bold")
             else:
                 plot_point(lon[-1], lat[-1], marker="_", markeredgecolor='k',
                            markersize=10/25 * self.mermaid_markersize,
-                           markerfacecolor='k', zorder=125+_i)
+                           markerfacecolor='k', zorder=125+_i, clip_on=True)
 
         for end_point in self.end_points:
 
@@ -1082,7 +1090,7 @@ class MermaidLocations(object):
                            markersize=self.mermaid_markersize,
                            marker=mermaid_verts,
                            markeredgecolor='k', markerfacecolor='orange',
-                           zorder=125+_i)
+                           zorder=125+_i, clip_on=True)
 
                 if self.plot_labels:
                     plot_text(self.mermaid_names[end_point[0]],
@@ -1091,12 +1099,14 @@ class MermaidLocations(object):
                               horizontalalignment="center",
                               verticalalignment='center',
                               multialignment="center",
-                              fontsize=self.markerfontsize, fontweight="bold")
+                              fontsize=self.markerfontsize, fontweight="bold"
+                              , clip_on=True)
                 else:
                     plot_point(end_point[2], end_point[1],
                                marker="_", markeredgecolor='k',
                                markersize=10/25 * self.mermaid_markersize,
-                               markerfacecolor='k', zorder=125+_i)
+                               markerfacecolor='k', zorder=125+_i,
+                               clip_on=True)
 
 
     def plot_aux_data(self):

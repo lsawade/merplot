@@ -2,3 +2,8 @@
 __pycache__
 date
 data
+*.pdf
+*.pyc
+*.png
+*.svg
+.DS_Store
