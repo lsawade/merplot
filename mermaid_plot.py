@@ -292,13 +292,12 @@ def get_positions(vital_file, begin=UTCDateTime("2000-01-01T00:00:00"),
             # Speed of the Mermaid between two successive points.
             speed = mdist / ((date[counter] - date[counter - 1]) / 3600)
 
-
         # Get coordinates under certain conditions
         if lat != 0 \
                 and lon != 0 \
-                and lat < 20 \
-                and (lon <= -100 or lon > 100)\
-                and speed < 2.0\
+                and lat < 20.0 \
+                and (lon <= -100.0 or lon > 100.0)\
+                and speed < 26.0\
                 and p_dist > 1.5\
                 and n_dist > 1.5\
                 and mdist < 1111:
@@ -353,11 +352,14 @@ def plot_path(lon, lat, **kwargs):
     :param lat: list of latitudes
     :param lon: list of logitudes
     :param kwargs: keyword arguments for plotting function
+    :return: path handle
 
     """
 
     # Plot track
-    plt.plot(lon, lat, transform=ccrs.Geodetic(), **kwargs)
+    path = plt.plot(lon, lat, transform=ccrs.Geodetic(), **kwargs)
+
+    return path
 
 
 def plot_point(lon, lat, size=2,  **kwargs):
@@ -366,29 +368,30 @@ def plot_point(lon, lat, size=2,  **kwargs):
     :param lat: one latitude degree
     :param lon: one longitude degree 
     :param kwargs: keyword arguments for plotting function
-
+    :return: plot handle
     """
 
     # Plot track
-    plt.plot(lon, lat, transform=ccrs.Geodetic(), **kwargs)
+    pl = plt.plot(lon, lat, transform=ccrs.Geodetic(), **kwargs)
+
+    return pl
 
 
-def plot_text(text, lon, lat, lat_offset=0, lon_offset=0, **kwargs):
+def plot_text(text, lon, lat, **kwargs):
     """ Plots line on map.
 
     :param text: String with text input
     :param lat: one latitude degree
     :param lon: one longitude degree
-    :param lat_offset: offset from latitude
-    :param lon_offset: offset from longitude 
     :param kwargs: keyword arguments for plotting function
-
+    :return: text handle
     """
 
     # Plot track
-    plt.text(lon + lon_offset, lat + lat_offset, text,
-             transform=ccrs.Geodetic(), **kwargs)
+    txt = plt.text(lon, lat, text,
+                   transform=ccrs.Geodetic(), **kwargs)
 
+    return txt
 
 class MermaidLocations(object):
     """Class that handles plotting of MERMAIDS using the vital file input.
@@ -420,6 +423,7 @@ class MermaidLocations(object):
                 legend=True, legend_cols=1, legend_title=None,
                 fontsize=14,
                 plot_labels=True,
+                label_offset=-0.05,
                 trajectories=True,
                 trajectory_width=8,
                 trajectory_cmp="gist_heat",
@@ -473,6 +477,11 @@ class MermaidLocations(object):
         :param plot_labels: Plot labels of the mermaid number onto the
                                markers
         :type plot_labels: bool
+        :param label_offset: Text will be offset by a some latitude.
+                             Important if you change the size of the marker
+                             since the center of the text is not on the point
+                             given in label location.
+        :type label_offset: float
         :param markerfontsize: Fontsize for Label on Mermaid marker
         :type markerfontsize: float or int
         :param trajectories: Plot trajectories of the mermaids. Default
@@ -527,6 +536,7 @@ class MermaidLocations(object):
         # Markers
         self.mermaid_markersize = mermaid_markersize
         self.plot_labels = plot_labels
+        self.label_offset = label_offset
         if markerfontsize == None:
             self.markerfontsize = 5/25 * self.mermaid_markersize
         else:
@@ -728,11 +738,17 @@ class MermaidLocations(object):
         segments = []
         times = []
 
+        # Necessary for marker plotting
+        marker_location_list = []
+        marker_list = []
+        label_list = []
+
         for _i in range(self.frames):
 
             # List of indices for each mermaid of one frame.
             frame_segments = []
             frame_times = []
+            frame_last_locations = []
 
             # Create big line collection for every frame
             for _j, (lat, lon, t) in enumerate(zip(self.latitudes,
@@ -743,6 +759,14 @@ class MermaidLocations(object):
                 ind = np.where((time_chunks[_i][0] <= np.array(t))
                                & (np.array(t) <= time_chunks[_i][1]))[0]
 
+                if len(ind) > 0:
+                    # last location
+                    last_lat = np.array(lat)[ind][-1]
+                    last_lon = np.array(lon)[ind][-1]
+                    frame_last_locations.append([last_lon, last_lat])
+                else:
+                    # Append None if there is no updated location.
+                    frame_last_locations.append(None)
 
                 if len(ind) > 1:
 
@@ -758,6 +782,20 @@ class MermaidLocations(object):
                     frame_segments += segs
                     frame_times += picked_times[inds].tolist()
 
+                # Creating an emtpy list of markers outside the map
+                # it wasn't possible to make the markers empty
+                if _i == 0:
+                    marker, lab = self._plot_mermaid_marker(
+                        np.array([9999]),
+                        np.array([9999]),
+                        self.mermaid_names[_j],
+                        zorder=10000 + _j)
+                    # Add marker to marker list and label to label list
+                    marker_list.append(marker)
+                    label_list.append(lab)
+
+            # Add all location for one frame to location list
+            marker_location_list.append(frame_last_locations)
 
             if len(frame_segments) > 0:
                 # Create line collection and append to LC for each frame
@@ -767,13 +805,7 @@ class MermaidLocations(object):
                                                 self.last_time,
                                                 self.trajectory_cmap,
                                                 self.trajectory_width)
-                #
-                # lc = self._make_line_collection(np.array(frame_segments),
-                #                                 np.array(frame_times),
-                #                                 self.first_time,
-                #                                 self.last_time,
-                #                                 self.trajectory_cmap,
-                #                                 self.trajectory_width)
+
                 line_collection_list.append(self.ax.add_collection(lc))
                 segments.append(frame_segments)
                 times.append(frame_times)
@@ -782,10 +814,7 @@ class MermaidLocations(object):
                 segments.append(None)
                 times.append(None)
 
-        # for lc in line_collection_list:
-        #     if lc is not None:
-        #         self.ax.add_collection(lc)
-
+        # Create Update function for the map
         def update(i):
 
             # Note the -1 index. has been set because the times are reversed
@@ -796,15 +825,33 @@ class MermaidLocations(object):
                 z = line_collection_list[-i].get_zorder()
                 line_collection_list[-i].set_zorder(z+i)
 
+            for _j, (marker, label, locs) in \
+                enumerate(zip(marker_list, label_list,
+                              marker_location_list[-i])):
+                if locs is not None:
+                    # Setting marker[0] is necessary
+                    marker[0].set_xdata(locs[0])
+                    marker[0].set_ydata(locs[1])
+                    label.set_position((locs[0], locs[1] + self.label_offset))
 
-            return (x for x in line_collection_list if x is not None)
+            # Only return none-None objects to be updated.
+            return_tuple = [x for x in line_collection_list if x is not None] \
+                + [x[0] for x in marker_list if x is not None] \
+                + [x for x in label_list if x is not None]
+            return return_tuple
 
+
+        # Create animation is activated outside this function via plt.show()
         ani = animation.FuncAnimation(self.fig, update,
                                       frames=np.arange(self.frames)+1,
                                       interval=1, repeat=False, blit=True,
                                       init_func=lambda:
                                       [x for x in line_collection_list
                                        if x is not None]
+                                      + [x[0] for x in marker_list
+                                         if x is not None]
+                                      + [x for x in label_list
+                                         if x is not None]
                                       )
 
     def _get_time_chunks(self):
@@ -1041,73 +1088,66 @@ class MermaidLocations(object):
         """
 
         # Mermaid marker
-        mermaid_verts = [(0.1, -.9), (0.1, -0.3), (0.25, -0.3), (0.4, 0),
-                         # right
-                         (0.25, 0.3), (0.1, 0.3), (0.1, 0.35), (0.05, 0.35),
-                         (0.05, 0.9),
-                         (-0.05, 0.9), (-0.05, 0.35), (-0.1, 0.35),  # left
-                         (-0.1, 0.3), (-0.25, 0.3), (-0.4, 0), (-0.25, -0.3),
-                         (-0.1, -0.3), (-0.1, -1), (0.1, -.9)]
+        mermaid_verts = self._get_mermaid_vertices()
 
         # Plot Mermaid Locations
         for _i, (lat, lon) in enumerate(zip(self.latitudes, self.longitudes)):
 
             # Add label for one Mermaid.
             if _i == 0:
-                # Mermaid Marker with label
-                plot_point(lon[-1], lat[-1], markersize=self.mermaid_markersize,
-                           marker=mermaid_verts,
-                           markeredgecolor='k', markerfacecolor='orange',
-                           zorder=125+_i, label="Mermaid", clip_on=True)
+                self._plot_mermaid_marker(lon[-1], lat[-1],
+                                          self.mermaid_names[_i],
+                                          zorder=125 + _i, label="Mermaid")
             else:
-                # Mermaid Marker
-                plot_point(lon[-1], lat[-1], markersize=self.mermaid_markersize,
-                           marker=mermaid_verts,
-                           markeredgecolor='k', markerfacecolor='orange',
-                           zorder=125+_i, clip_on=True)
 
-            if self.plot_labels:
-                plot_text(self.mermaid_names[_i], lon[-1], lat[-1],
-                          lon_offset=0, lat_offset=-0.05, zorder=125+_i,
-                          clip_on=True, horizontalalignment="center",
-                          verticalalignment='center',
-                          multialignment="center",
-                          fontsize=self.markerfontsize, fontweight="bold")
-            else:
-                plot_point(lon[-1], lat[-1], marker="_", markeredgecolor='k',
-                           markersize=10/25 * self.mermaid_markersize,
-                           markerfacecolor='k', zorder=125+_i, clip_on=True)
+                self._plot_mermaid_marker(lon[-1], lat[-1],
+                                          self.mermaid_names[_i],
+                                          zorder=125 + _i)
 
         for end_point in self.end_points:
 
             # Check if distance large enough. The value 6 was found by trial
             # and error. Lower values would have included the 24h tests as
-            # previous posititions, and we don't want those
-            if end_point[3] > 6:
+            # previous posititions, and we don't want those.
+            # The zorder here is set to a lower value than the main markers.
+            # So that the main markers are always on top!
+            if end_point[3] > 5.28:
 
-                # Mermaid Marker
-                plot_point(end_point[2], end_point[1],
-                           markersize=self.mermaid_markersize,
-                           marker=mermaid_verts,
-                           markeredgecolor='k', markerfacecolor='orange',
-                           zorder=125+_i, clip_on=True)
+                self._plot_mermaid_marker(end_point[2], end_point[1],
+                                          self.mermaid_names[end_point[0]],
+                                          zorder=75+_i)
 
-                if self.plot_labels:
-                    plot_text(self.mermaid_names[end_point[0]],
-                              end_point[2], end_point[1],
-                              lon_offset=0, lat_offset=-0.05, zorder=125+_i,
-                              horizontalalignment="center",
-                              verticalalignment='center',
-                              multialignment="center",
-                              fontsize=self.markerfontsize, fontweight="bold"
-                              , clip_on=True)
-                else:
-                    plot_point(end_point[2], end_point[1],
-                               marker="_", markeredgecolor='k',
-                               markersize=10/25 * self.mermaid_markersize,
-                               markerfacecolor='k', zorder=125+_i,
-                               clip_on=True)
+    def _plot_mermaid_marker(self, lon, lat, name, **kwargs):
+        """ Plot mermaid marker. Only kwargs that work for both scatter
+        plotting and text plotting are usable here!
 
+        :param lon: longitude
+        :param lat: latitude
+        :param name: name of mermaid.
+        :param kwargs: for plt.text and plt.plot/scatter
+        :return: tuple with (marker, label) handles
+
+        """
+
+        # Mermaid Marker
+        marker = plot_point(lon, lat, markersize=self.mermaid_markersize,
+                            marker=self._get_mermaid_vertices(),
+                            markeredgecolor='k', markerfacecolor='orange',
+                            clip_on=True, **kwargs)
+
+        if self.plot_labels:
+            lab = plot_text(name, lon, lat + self.label_offset,
+                            clip_on=True, horizontalalignment="center",
+                            verticalalignment='center',
+                            multialignment="center",
+                            fontsize=self.markerfontsize, fontweight="bold",
+                            **kwargs)
+        else:
+            lab = plot_point(lon, lat, marker="_", markeredgecolor='k',
+                       markersize=10 / 25 * self.mermaid_markersize,
+                       markerfacecolor='k', clip_on=True, **kwargs)
+
+        return marker, lab
 
     def plot_aux_data(self):
         """Plot data that is added to the class prior to plotting."""
@@ -1162,7 +1202,16 @@ class MermaidLocations(object):
         cb.set_label('  UTC', rotation="horizontal", fontsize=self.fontsize,
                      horizontalalignment="left", fontweight="bold")
 
-
+    @staticmethod
+    def _get_mermaid_vertices():
+        """Returns vertices for the mermaid marker."""
+        return [(0.1, -.9), (0.1, -0.3), (0.25, -0.3), (0.4, 0),
+                # right
+                (0.25, 0.3), (0.1, 0.3), (0.1, 0.35), (0.05, 0.35),
+                (0.05, 0.9),
+                (-0.05, 0.9), (-0.05, 0.35), (-0.1, 0.35),  # left
+                (-0.1, 0.3), (-0.25, 0.3), (-0.4, 0), (-0.25, -0.3),
+                (-0.1, -0.3), (-0.1, -1), (0.1, -.9)]
 
 if __name__ == "__main__":
     print("This function is only called by python binaries or imported"

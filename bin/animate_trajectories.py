@@ -37,11 +37,6 @@ if __name__ == "__main__":
 
     parser.add_argument('filelist', help='vital file list',
                         type=str, nargs='+')
-    parser.add_argument('-o', action='store', dest='outfile', default=None,
-                        required=False, help="Path to Outputfile.")
-    parser.add_argument('-r', action='store', dest='dpi', default=300,
-                        type=int, required=False, help="Resolution in dpi")
-
     args = parser.parse_args()
 
     # Legend title
@@ -111,7 +106,4 @@ if __name__ == "__main__":
                     label="Shimizu-Valparaíso - Dec/Jan ’18/‘19")
 
     # Plot
-    if args.outfile is not None:
-        ML.plot(f=args.outfile, dpi=args.dpi)
-    else:
-        ML.plot()
+    ML.animate()
