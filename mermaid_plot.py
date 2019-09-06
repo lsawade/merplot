@@ -63,6 +63,21 @@ RendererBase.new_gc = types.MethodType(custom_new_gc, RendererBase)
 #------------------------------------------------------------------------------
 
 
+# A filter dictionary for each Mermaid, each Mermaid entry will have a list
+# of lists. This enables us to choose multiple windows that can be extracted.
+#
+
+# Pretime is a time that is definitely before any deployments
+pretime = "2000-01-01T00:00:01"
+
+# Dictionary structure
+#                    "Mermaid number": [[starttime , endtime],
+#                                       [starttime , endtime],
+#                                       ...                 ],
+filter_times_dict = {"1": [[pretime, "2018-12-27T01:37:34"]],
+                     "2": [[pretime, "2018-12-28T17:56:32"]]}
+
+
 def max_UTC(UTC_list, ind=False):
     """ Get first, latest time in a list of UTC
 
