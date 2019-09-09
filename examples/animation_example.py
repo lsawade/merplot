@@ -5,8 +5,8 @@ import glob
 # Add path so mermaid_plot can be read
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from mermaid_plot import MermaidLocations
-from mermaid_plot import get_coordinates_from_kml_path
+from merplot.mermaid_plot import MermaidLocations
+from merplot.mermaid_plot import get_coordinates_from_kml_path
 
 
 # Add data path
@@ -17,8 +17,7 @@ sys.path.append(data_path)
 # File list
 file_list = glob.glob(os.path.join(data_path, "*.vit"))
 
-
-# wms setup
+# WMS setup: Set to true of you have internet and want a high res map
 wms = False
 wms_url = 'https://ahocevar.com/geoserver/wms'
 wms_layer = 'ne:NE1_HR_LC_SR_W_DR'

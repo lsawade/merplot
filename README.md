@@ -8,7 +8,6 @@ locations and trajectories on a map.
 As of now, you need obspy because its UTCDateTime class which is very 
 convenient, but I am looking into `matplotlib`'s datetime utilities which I 
 think can avoid the need for `obspy` and make the code simpler, in fact.
-
 Other than that `numpy`, `matplotlib` and `cartopy` are required to run the 
 plotting scripts.
 
@@ -20,7 +19,7 @@ conda create -n merplot python=3.7
 ```
 
 Here, I set the name of the environment to merplot. Of course, you can change
-the name, but make sur you change it in the follwoing steps as well. 
+the name, but make sure you change it in the following steps as well. 
 Especially advanced Users may jump over this point.
 This creates a conda environment which will be convenient to work in as the 
 rest of the computer is not "disturbed".
@@ -32,27 +31,26 @@ Activation:
 conda activate merplot
 ```
 
+to install everything you need, simply enter...
 ```bash
-# Installing ObsPy
-conda install obspy
+# CHange directory to the merplot directory:
+conda install --file requirements.txt
+
+# Followed by
+pip install -e .
 ```
 
-Then, since matplotlib and numpy are installed by `ObsPy`, we only need to 
-install `cartopy`.
-
-```bash
-pip install cartopy
-```
+Then, everything should be installed and working.
 
 ## Usage
 
 There are two ways of using the module. You can either use the python 
 "binaries" in the `bin` directory or you may use the module by itself -- 
-meaning you will have to import stuff manually.
+meaning you will have to import stuff manually as follows.
 
 ```python
 import glob
-from mermaid_plot import MermaidLocations
+from merplot.mermaid_plot import MermaidLocations
 
 # Find all vital files in a directory
 vital_file_list = glob.glob("<path_to_your_dir>/*.vit")  
@@ -64,12 +62,13 @@ ML = MermaidLocations.from_vit_file(vital_file_list)
 ML.plot()
 ```
 
-This will open a new window containing a plot with the latest positions and 
-the trajectories.
+In the example directory, there are two very detailed examples that cover 
+both the static map example as well as the animation.
 
 There are more functions in the module, but describing every usage is a bit 
-too expansive in a `README`. Check out the module itself, it is fairly well 
-documented with some use cases of the simple functions.
+too extensive in a `README`. Check out the module itself, it is fairly well 
+documented with some use cases of the simple functions. Also there is a tiny 
+auto documentation.
 
 Happy plotting!
 

@@ -7,3 +7,5 @@ data
 *.png
 *.svg
 .DS_Store
+build
+/merplot.egg-info

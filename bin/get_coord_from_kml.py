@@ -22,7 +22,7 @@ import os
 # Add module path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from mermaid_plot import get_coordinates_from_kml_path
+from merplot.mermaid_plot import get_coordinates_from_kml_path
 
 if __name__ == "__main__":
     """

@@ -10,14 +10,12 @@
     (http://www.gnu.org/copyleft/lgpl.html):
 
 Last Update:
-    August 2019
+    September 2019
 
 """
 
 import re
 import os
-import sys
-import time
 # I think there is probably a matplotlib function with date time, if I can
 # find out about that, I can write a simple vincenty formula for
 # locations2degree. If I just prepend it to the code and call it the same the
@@ -25,19 +23,16 @@ import time
 # Then it's only basic python code + matplotlib + numpy + cartopy
 from obspy import UTCDateTime
 from obspy.geodetics.base import locations2degrees
-import argparse
 import codecs
 import numpy as np
 
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
-from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 import matplotlib.ticker as mticker
 from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter
 from matplotlib.collections import LineCollection
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-import matplotlib
 import yaml
 
 

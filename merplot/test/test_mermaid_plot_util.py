@@ -5,14 +5,13 @@ import sys
 # Appending main path.
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
-import pytest
 import unittest
 from obspy import UTCDateTime
-from mermaid_plot import min_UTC
-from mermaid_plot import max_UTC
-from mermaid_plot import read_yaml_file
-from mermaid_plot import get_coordinates_from_kml_path
-from mermaid_plot import get_positions
+from merplot.mermaid_plot import min_UTC
+from merplot.mermaid_plot import max_UTC
+from merplot.mermaid_plot import read_yaml_file
+from merplot.mermaid_plot import get_coordinates_from_kml_path
+from merplot.mermaid_plot import get_positions
 
 # Adding the test data directory
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
