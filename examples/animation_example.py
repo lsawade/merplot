@@ -1,9 +1,12 @@
 import os
 import sys
 import glob
+
+# Add path so mermaid_plot can be read
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+
 from mermaid_plot import MermaidLocations
 from mermaid_plot import get_coordinates_from_kml_path
-
 
 
 # Add data path
@@ -11,9 +14,8 @@ data_path = os.path.join(os.path.dirname(
         os.path.dirname(os.path.abspath(__file__))), "data")
 sys.path.append(data_path)
 
-
 # File list
-file_list = glob.glob(os.path.join(data_path), "*.vit")
+file_list = glob.glob(os.path.join(data_path, "*.vit"))
 
 
 # wms setup
