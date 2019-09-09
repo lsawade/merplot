@@ -12,6 +12,7 @@ Welcome to merplot's documentation!
 
    installation
    tutorial
+   filter
 
 
 Modules

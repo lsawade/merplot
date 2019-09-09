@@ -9,4 +9,4 @@ Static Map
 
 The first and maybe most important result is the static map.
 
-.. mdinclude:: ../../../examples/static_example
+.. mdinclude:: ../../../examples/static_example.py
