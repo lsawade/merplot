@@ -38,6 +38,7 @@ from matplotlib.collections import LineCollection
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import matplotlib
+import yaml
 
 
 
@@ -63,19 +64,24 @@ RendererBase.new_gc = types.MethodType(custom_new_gc, RendererBase)
 #------------------------------------------------------------------------------
 
 
-# A filter dictionary for each Mermaid, each Mermaid entry will have a list
-# of lists. This enables us to choose multiple windows that can be extracted.
-#
+# For reading the filter file into a dictionary
+def read_yaml_file(filename):
+    """Reads yaml file and returns dictionary with content.
 
-# Pretime is a time that is definitely before any deployments
-pretime = "2000-01-01T00:00:01"
+    :param filename: String with yaml file location
+    :type filename: str
+    :returns: dict
 
-# Dictionary structure
-#                    "Mermaid number": [[starttime , endtime],
-#                                       [starttime , endtime],
-#                                       ...                 ],
-filter_times_dict = {"1": [[pretime, "2018-12-27T01:37:34"]],
-                     "2": [[pretime, "2018-12-28T17:56:32"]]}
+    Usage:
+
+        # Read the file
+        d = read_yaml_file(<some_yaml_file_location_as_string>)
+
+        value = d[key]
+
+        """
+    with open(filename) as fh:
+        return yaml.load(fh, Loader=yaml.FullLoader)
 
 
 def max_UTC(UTC_list, ind=False):
@@ -95,7 +101,6 @@ def max_UTC(UTC_list, ind=False):
 
             # Assuming you have a list of UTCDateTimes
             most_recent_UTC = max_UTC(<some_UTCDatetime_list>)
-
 
     """
 
@@ -731,7 +736,13 @@ class MermaidLocations(object):
             This method only works if you have defined the times!
 
 
-            """
+        The way this method works is, first all full segments to be drawn at
+        each timestep are computed into lists as well as the final marker
+        positions. These are then accessed by the update() function, which
+        changes the location of the marker and adds the trajectory.
+
+        The update function is defined inside this function, as it has no
+        meaning outside."""
 
         if self.times is None:
             raise ValueError("You can only plot trajectories if the time "
@@ -831,7 +842,9 @@ class MermaidLocations(object):
 
         # Create Update function for the map
         def update(i):
-
+            """ This is the function that updates the figure. Meaning,
+            The mermaid marker locations are updated, additional trajectories
+            are addad are added and the """
             # Note the -1 index. has been set because the times are reversed
             # due to previous calculations...
             if line_collection_list[-i] is not None:

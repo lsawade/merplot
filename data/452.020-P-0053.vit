@@ -1,0 +1,103 @@
+20190818-09h36mn25: >>> BUOY 0053 2019-08-18T09:36:23 <<<
+20190818-09h36mn26: S29deg20.474mn, W155deg25.812mn
+20190818-09h36mn28: hdop 3.220, vdop 3.740
+20190818-09h36mn29: Vbat 15453mV (min 13388mV)
+20190818-09h36mn32: Pint 80410Pa
+20190818-09h36mn32: Pext 56mbar (range 10mbar)
+20190818-09h37mn14: 7 cmd(s) received
+20190818-09h37mn21: 1 file(s) to upload
+20190818-09h40mn15: >>> BUOY 0053 2019-08-18T09:40:13 <<<
+20190818-09h40mn16: S29deg20.474mn, W155deg25.812mn
+20190818-09h40mn22: hdop 3.220, vdop 3.740
+20190818-09h40mn22: Vbat 15453mV (min 13388mV)
+20190818-09h40mn23: Pint 80410Pa
+20190818-09h40mn26: Pext 56mbar (range 10mbar)
+20190818-09h41mn55: 15 cmd(s) received
+20190818-09h41mn55: 1 file(s) to upload
+20190818-09h43mn00: 1 file(s) uploaded
+20190818-09h43mn08: <<<<<<<<<<<<<<< Bye >>>>>>>>>>>>>>>
+
+
+20190818-09h47mn09: >>> BUOY 0053 2019-08-18T09:47:06 <<<
+20190818-09h47mn09: S29deg20.474mn, W155deg25.812mn
+20190818-09h47mn10: hdop 3.220, vdop 3.740
+20190818-09h47mn13: Vbat 15453mV (min 13388mV)
+20190818-09h47mn15: Pint 80410Pa
+20190818-09h47mn16: Pext 56mbar (range 10mbar)
+20190818-09h50mn31: >>> BUOY 0053 2019-08-18T09:50:30 <<<
+20190818-09h50mn33: S29deg20.474mn, W155deg25.812mn
+20190818-09h50mn36: hdop 3.220, vdop 3.740
+20190818-09h50mn37: Vbat 15453mV (min 13388mV)
+20190818-09h50mn38: Pint 80410Pa
+20190818-09h50mn40: Pext 56mbar (range 10mbar)
+20190818-09h51mn19: 7 cmd(s) received
+20190818-09h51mn26: 1 file(s) to upload
+20190818-09h52mn21: 1 file(s) uploaded
+20190818-09h52mn31: <<<<<<<<<<<<<<< Bye >>>>>>>>>>>>>>>
+
+
+20190818-22h10mn53: >>> BUOY 0053 2019-08-18T22:10:51 <<<
+20190818-22h10mn54: S30deg08.518mn, W157deg38.414mn
+20190818-22h10mn57: hdop 1.790, vdop 1.850
+20190818-22h10mn59: Vbat 15482mV (min 14335mV)
+20190818-22h11mn02: Pint 80187Pa
+20190818-22h11mn03: Pext 58mbar (range 10mbar)
+20190818-22h11mn46: 8 cmd(s) received
+20190818-22h11mn53: 1 file(s) to upload
+20190818-22h13mn07: 1 file(s) uploaded
+20190818-22h13mn15: <<<<<<<<<<<<<<< Bye >>>>>>>>>>>>>>>
+
+
+20190818-22h17mn04: >>> BUOY 0053 2019-08-18T22:17:03 <<<
+20190818-22h17mn06: S30deg08.518mn, W157deg38.414mn
+20190818-22h17mn07: hdop 1.790, vdop 1.850
+20190818-22h17mn09: Vbat 15482mV (min 14335mV)
+20190818-22h17mn15: Pint 80187Pa
+20190818-22h17mn17: Pext 58mbar (range 10mbar)
+20190818-22h18mn00: 7 cmd(s) received
+20190818-22h18mn02: 1 file(s) to upload
+20190818-22h19mn16: 1 file(s) uploaded
+20190818-22h19mn24: <<<<<<<<<<<<<<< Bye >>>>>>>>>>>>>>>
+
+
+20190818-22h45mn31: >>> BUOY 0053 2019-08-18T22:45:24 <<<
+20190818-22h45mn37: S30deg11.084mn, W157deg45.481mn
+20190818-22h45mn39: hdop 0.900, vdop 1.190
+20190818-22h45mn39: Vbat 15215mV (min 14580mV)
+20190818-22h45mn39: Pint 80338Pa
+20190818-22h45mn40: Pext 68mbar (range 10mbar)
+20190818-22h48mn45: >>> BUOY 0053 2019-08-18T22:48:43 <<<
+20190818-22h48mn46: S30deg11.192mn, W157deg45.821mn
+20190818-22h48mn49: hdop 0.900, vdop 1.190
+20190818-22h48mn50: Vbat 15215mV (min 14580mV)
+20190818-22h48mn56: Pint 80338Pa
+20190818-22h48mn57: Pext 68mbar (range 10mbar)
+20190818-22h49mn32: 7 cmd(s) received
+20190818-22h49mn39: 3 file(s) to upload
+20190818-22h52mn10: 3 file(s) uploaded
+20190818-22h52mn17: <<<<<<<<<<<<<<< Bye >>>>>>>>>>>>>>>
+
+
+20190819-23h04mn25: >>> BUOY 0053 2019-08-19T23:04:23 <<<
+20190819-23h04mn28: S30deg09.684mn, W157deg44.700mn
+20190819-23h04mn31: hdop 0.650, vdop 0.930
+20190819-23h04mn31: Vbat 14614mV (min 13858mV)
+20190819-23h04mn31: Pint 79546Pa
+20190819-23h04mn37: Pext 43mbar (range 20mbar)
+20190819-23h05mn13: 7 cmd(s) received
+20190819-23h05mn20: 2 file(s) to upload
+20190819-23h11mn34: 2 file(s) uploaded
+20190819-23h11mn41: <<<<<<<<<<<<<<< Bye >>>>>>>>>>>>>>>
+
+
+20190819-23h14mn32: >>> BUOY 0053 2019-08-19T23:14:31 <<<
+20190819-23h14mn38: S30deg09.755mn, W157deg44.676mn
+20190819-23h14mn38: hdop 0.750, vdop 1.020
+20190819-23h14mn38: Vbat 14614mV (min 13858mV)
+20190819-23h14mn38: Pint 79546Pa
+20190819-23h14mn39: Pext 43mbar (range 20mbar)
+20190819-23h15mn19: 6 cmd(s) received
+20190819-23h15mn26: no file to upload
+20190819-23h15mn37: <<<<<<<<<<<<<<< Bye >>>>>>>>>>>>>>>
+
+
