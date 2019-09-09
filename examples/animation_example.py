@@ -88,4 +88,4 @@ ML.add_aux_data([s_lon, v_lon], [s_lat, v_lat], color="b", linewidth=2.5,
 
 
 # Plot
-ML.animate()
+ML.animate(f="test.mpeg", writer=60)

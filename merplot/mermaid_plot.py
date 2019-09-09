@@ -401,6 +401,7 @@ class MermaidLocations(object):
                 trajectory_cmp="gist_heat",
                 wms=False, wms_url=None, wms_layer=None,
                 frames=100,
+                animation_writer="ffmpeg",
                 figsize=(15, 8)):
         """
 
@@ -472,6 +473,10 @@ class MermaidLocations(object):
         :param frames: If animation is wanted the frame number can be set
                        with this kwarg.
         :type frames: int
+        :param animation_writer: Choose what encoder to use to write the
+                                 animation to file. Default is "ffmpeg",
+                                 imagemagick requires a brew install on mac.
+        :type animation_writer: str
         :param figsize: Define the figure size (Width, Height)
         :type figsize: tuple
         :return: MermaidLocation object.
@@ -521,6 +526,7 @@ class MermaidLocations(object):
 
         # Animation settings
         self.frames = frames
+        self.writer = animation_writer
 
         # WMS settings
         self.wms = wms
@@ -674,11 +680,23 @@ class MermaidLocations(object):
         self.plot_legend()
 
         # Plot animation
-        self.plot_animation()
+        ani = self.plot_animation()
 
-        # Show everything
-        plt.show()
 
+        if f is None:
+            # Show everything
+            plt.show()
+        else:
+            # Set up formatting for the movie files
+            if self.writer == "ffmpeg":
+                Writer = animation.writers['ffmpeg']
+                writer = Writer(fps=60, metadata=dict(artist='Me'),
+                                bitrate=1800)
+            elif self.writer == "ffmpeg":
+                Writer = animation.writers['imagemagick']
+                writer = Writer(fps=60, metadata=dict(artist='Me'))
+
+            ani.save(f, writer=writer)
 
     def plot_animation(self):
         """ Plots animation of the trajectories
@@ -860,6 +878,8 @@ class MermaidLocations(object):
                                       + [x for x in label_list
                                          if x is not None]
                                       )
+
+        return ani
 
     def _get_time_chunks(self):
         """From the number of frames as well as min/max times the time chunks
