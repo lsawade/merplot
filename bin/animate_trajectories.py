@@ -46,8 +46,13 @@ if __name__ == "__main__":
     wms_url = 'https://ahocevar.com/geoserver/wms'
     wms_layer = 'ne:NE1_HR_LC_SR_W_DR'
 
+    # Filter file
+    filter_file = os.path.join(data_path, "mermaid_filter.yml")
+
     # Run
-    ML = MermaidLocations.from_vit_file(args.filelist, minlat=-45,
+    ML = MermaidLocations.from_vit_file(args.filelist,
+                                        filter_dict=filter_file,
+                                        minlat=-45,
                                         legend_cols=1, legend_title="SPPIM",
                                         trajectory_width=6,
                                         wms=wms, wms_url=wms_url,

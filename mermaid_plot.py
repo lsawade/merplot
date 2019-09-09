@@ -219,13 +219,11 @@ def get_coordinates_from_kml_path(kml_file):
     return latitudes, longitudes
 
 
-def get_positions(vital_file, begin=UTCDateTime("2000-01-01T00:00:00"),
-                  end=UTCDateTime("2100-01-01T00:00:00")):
+def get_positions(vital_file, filter_dict=False):
     """ Reads vital file and the gps coordinates in it.
 
     :param vital_file: path/to/your_float.vit
-    :param begin: UTCDatetime with start of gps positions
-    :param end: UTCDatetime with end of gps positions
+    :param filter_dict: This is a filter dictionary for the specific
 
     :return: tuple of three lists (dates, latitudes, longitudes)
 
@@ -238,8 +236,7 @@ def get_positions(vital_file, begin=UTCDateTime("2000-01-01T00:00:00"),
 
             # Get lats, lons
             mermaid_name, dates, latitudes, longitudes = \
-                get_positions(vit_file, begin=UTCDateTime(<sometime>)
-                              end=UTCDateTime(<sometime_later>))
+                get_positions(vit_file, filter_dict)
 
     """
 
@@ -251,89 +248,51 @@ def get_positions(vital_file, begin=UTCDateTime("2000-01-01T00:00:00"),
     gps_catch = re.findall(
         "(.+): (.{3,5})deg(.+)mn, (.+)deg(.+)mn", content)
 
-    date = [UTCDateTime(0).strptime(i[0], "%Y%m%d-%Hh%Mmn%S") for i in gps_catch]
-    latitude = [float(s[1].strip()[1:]) + float(s[2]) / 60
+    dates = [UTCDateTime(0).strptime(i[0], "%Y%m%d-%Hh%Mmn%S") for i in
+             gps_catch]
+    latitudes = [float(s[1].strip()[1:]) + float(s[2]) / 60
                 if s[1].strip()[0] == "N" else - float(s[1].strip()[1:])
                                                - float(s[2]) / 60
                 for s in gps_catch]
 
-    longitude = [float(s[3].strip()[1:]) + float(s[4]) / 60
+    longitudes = [float(s[3].strip()[1:]) + float(s[4]) / 60
                  if s[3].strip()[0] == "E" else - float(s[3].strip()[1:])
                                                 - float(s[4]) / 60
                  for s in gps_catch]
 
-    if len(date) < 1:
-        return
-
-    # Get values between the appropriate date
-    i = 0
-    while date[i] < begin and i < len(date)-1:
-        i += 1
-    j = 0
-    while date[j] < end and j < len(date)-1:
-        j += 1
-
-    date = date[i:j]
-    latitude = latitude[i:j]
-    longitude = longitude[i:j]
-
-    # Fix for missing GPS data.
-    counter = 0
-    counter_list = []
-    N = len(latitude)
-
-    date_fix = []
-    latitude_fix = []
-    longitude_fix = []
-
-    for lat, lon in zip(latitude, longitude):
-
-        # distance to papeete
-        p_dist = locations2degrees(lat, lon, -17.2, -149.2)
-        n_dist = locations2degrees(lat, lon, -22.3, 166.2)
-
-        #
-
-        # Get speed
-        if counter != N-1:
-
-            # Distance of mermaid between to successive dives
-            mdist = 111.11 * locations2degrees(lat, lon, latitude[counter + 1],
-                                       longitude[counter + 1])
-            # Speed of the Mermaid between two successive points.
-            speed = mdist / ((date[counter + 1] - date[counter]) / 3600)
-
-
-        else:
-
-            # Distance of mermaid between to successive dives
-            mdist = 111.11 * locations2degrees(lat, lon, latitude[counter - 1],
-                                       longitude[counter - 1])
-            # Speed of the Mermaid between two successive points.
-            speed = mdist / ((date[counter] - date[counter - 1]) / 3600)
-
-        # Get coordinates under certain conditions
-        if lat != 0 \
-                and lon != 0 \
-                and lat < 20.0 \
-                and (lon <= -100.0 or lon > 100.0)\
-                and speed < 26.0\
-                and p_dist > 1.5\
-                and n_dist > 1.5\
-                and mdist < 1111:
-            date_fix.append(date[counter])
-            longitude_fix.append(lon)
-            latitude_fix.append(lat)
-
-
-        counter += 1
-
     # Get the name of the Mermaid
-    mermaid_name_tmp = os.path.basename(vital_file).split(".")[1]\
+    mermaid_name_tmp = os.path.basename(vital_file).split(".")[1] \
                            .split("-")[1:]
     mermaid_name = mermaid_name_tmp[1].lstrip("0")
 
-    return mermaid_name, date_fix, latitude_fix, longitude_fix
+
+    # Filter if filter_dictionary is given
+    if filter_dict is not False:
+
+        # Create empty lists
+        latitudes_fixed = []
+        longitudes_fixed = []
+        dates_fixed = []
+
+        for _i, (date, latitude, longitude) in \
+                enumerate(zip(dates, latitudes, longitudes)):
+
+            # Filter date if it is in any filter window
+            if any([(UTCDateTime(window[0]) < date)
+                    and (date < UTCDateTime(window[1]))
+                    for window in filter_dict[int(mermaid_name)]
+                    ["time_filter"]]) is not True:
+                dates_fixed.append(date)
+                latitudes_fixed.append(latitude)
+                longitudes_fixed.append(longitude)
+
+    else:
+        latitudes_fixed = latitudes
+        longitudes_fixed = longitudes
+        dates_fixed = dates
+
+
+    return mermaid_name, dates_fixed, latitudes_fixed, longitudes_fixed
 
 
 def get_last_positions(vital_file_list):
@@ -355,9 +314,7 @@ def get_last_positions(vital_file_list):
 
 
         # Get last position:
-        mermaid_number, t, lat, lon = get_positions(vit,
-                                    begin=UTCDateTime("2000-01-01T00:00:00"),
-                                    end=UTCDateTime("2100-01-01T00:00:00"))
+        mermaid_number, t, lat, lon = get_positions(vit)
 
         # Check if there are no times for a Mermaid in the time window.
         if len(t) != 0:
@@ -582,9 +539,7 @@ class MermaidLocations(object):
 
 
     @classmethod
-    def from_vit_file(cls, vital_file_list,
-                      begin=UTCDateTime("2000-01-01T00:00:00"),
-                      end=UTCDateTime("2100-01-01T00:00:00"),
+    def from_vit_file(cls, vital_file_list, filter_dict=False,
                       **kwargs):
         """Gets the content of the vital and parses it to the class. Parameters
         are the same as for the `__init__` except the `latitude`, `longitude`,
@@ -597,13 +552,15 @@ class MermaidLocations(object):
         longitudes = []
         mermaid_names = []
 
+        # Get filter dictionary
+        if filter_dict:
+            filter_dict = read_yaml_file(filter_dict)
+
         for mermaid in vital_file_list:
 
             # Get locations and times
             mermaid_name, t, lat, lon = \
-                get_positions(mermaid,
-                              begin=begin,
-                              end=end)
+                get_positions(mermaid, filter_dict=filter_dict)
 
             # Check if there are no times for a Mermaid in the time window.
             if len(t) != 0:
@@ -764,10 +721,12 @@ class MermaidLocations(object):
         segments = []
         times = []
 
+        last_times = []
         # Necessary for marker plotting
         marker_location_list = []
         marker_list = []
         label_list = []
+        last_times = []
 
         for _i in range(self.frames):
 
@@ -775,6 +734,7 @@ class MermaidLocations(object):
             frame_segments = []
             frame_times = []
             frame_last_locations = []
+            frame_last_times = []
 
             # Create big line collection for every frame
             for _j, (lat, lon, t) in enumerate(zip(self.latitudes,
@@ -784,6 +744,9 @@ class MermaidLocations(object):
                 # Get indices within time_chunks
                 ind = np.where((time_chunks[_i][0] <= np.array(t))
                                & (np.array(t) <= time_chunks[_i][1]))[0]
+
+                # Saving the latest time for display purposes!
+                frame_last_times.append(time_chunks[_i][0])
 
                 if len(ind) > 0:
                     # last location
@@ -823,6 +786,10 @@ class MermaidLocations(object):
             # Add all location for one frame to location list
             marker_location_list.append(frame_last_locations)
 
+            # get last times for every timestep
+            last_times.append(max_UTC([self.last_time -  x for x in
+                                       frame_last_times]))
+
             if len(frame_segments) > 0:
                 # Create line collection and append to LC for each frame
                 lc = self._make_line_collection(np.array([]),
@@ -840,6 +807,13 @@ class MermaidLocations(object):
                 segments.append(None)
                 times.append(None)
 
+        # Set title
+        time = last_times[-1].isoformat().split(".")[
+            0].split("T")
+        label = "Date: %s -- Time: %s" % (time[0], time[1])
+        tit = plt.title(label)
+        tit.set_va("bottom")
+
         # Create Update function for the map
         def update(i):
             """ This is the function that updates the figure. Meaning,
@@ -853,6 +827,15 @@ class MermaidLocations(object):
                 z = line_collection_list[-i].get_zorder()
                 line_collection_list[-i].set_zorder(z+i)
 
+            # Updating the title
+            time1 = last_times[-i].isoformat().split(".")[
+                0].split("T")
+            label = "Date: %s -- Time: %s" % (time1[0], time1[1])
+            tit.set_text(label)
+            tit.set_backgroundcolor("w") # necessary because updating the
+            # title doesnt overwrite the old one, but plots it on top
+
+            # Updating the marker
             for _j, (marker, label, locs) in \
                 enumerate(zip(marker_list, label_list,
                               marker_location_list[-i])):
@@ -865,7 +848,8 @@ class MermaidLocations(object):
             # Only return none-None objects to be updated.
             return_tuple = [x for x in line_collection_list if x is not None] \
                 + [x[0] for x in marker_list if x is not None] \
-                + [x for x in label_list if x is not None]
+                + [x for x in label_list if x is not None] \
+                + [tit]
             return return_tuple
 
 
@@ -1086,7 +1070,7 @@ class MermaidLocations(object):
 
             # Only create segment if
             # Segment if distance is smaller than 5 degrees.
-            if dist < 1:
+            if dist < 3:
                 segments.append([(lon1, lat1), (lon2, lat2)])
                 indices.append(_j)
             else:
