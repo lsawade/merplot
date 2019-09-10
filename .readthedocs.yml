@@ -20,3 +20,6 @@ python:
     - method: pip
     - path: .
   system_packages: true
+
+
+path: .
