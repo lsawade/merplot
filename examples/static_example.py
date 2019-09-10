@@ -89,7 +89,7 @@ ML.add_aux_data([s_lon, v_lon], [s_lat, v_lat], color="b", linewidth=2.5,
 ML.plot()
 
 
-# To write, use matplotslib options in the plot config.
+# To write, use matplotlib options in the plot config.
 # **kwargs --> dpi, format, etc.
 
 # Plot

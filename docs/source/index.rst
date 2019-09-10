@@ -13,12 +13,7 @@ Welcome to merplot's documentation!
    installation
    tutorial
    filter
-
-
-Modules
-=======
-
-.. automodule:: merplot.mermaid_plot
+   modules
 
 Indices and tables
 ==================

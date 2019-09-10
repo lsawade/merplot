@@ -14,7 +14,7 @@ plotted using the following example (link to download script at the bottom.)
     :code: python
 
 
-See :download:`this example script <../../examples/static_example.py>`
+:download:`this example script <../../examples/static_example.py>`
 
 
 Animation
@@ -22,4 +22,18 @@ Animation
 
 The other interesting plotting tool is the animation creation tool, which
 still is based on the same class, but as the name suggests animates the
-trajectories of the mermaids.
+trajectories of the mermaids. It basically works the exact same way, but the
+plotting of the map is triggered by a different class method.
+
+
+.. include:: ../../examples/static_example.py
+    :code: python
+
+
+See :download:`this example script <../../examples/animation_example.py>`
+
+
+Binaries
+--------
+
+There are a few binaries that were created to make the

@@ -48,13 +48,18 @@ import types
 from matplotlib.backend_bases import GraphicsContextBase, RendererBase
 
 class GC(GraphicsContextBase):
+    """This class is unrelated to Mermaid, but fixes the issue of jagged
+    Lines when creating a LineCollection by defining the capstyle as round.
+    """
     def __init__(self):
         super().__init__()
         self._capstyle = 'round'
 
 def custom_new_gc(self):
+    """Returns new rendering class."""
     return GC()
 
+# Activating the renderer.
 RendererBase.new_gc = types.MethodType(custom_new_gc, RendererBase)
 #------------------------------------------------------------------------------
 
@@ -69,10 +74,12 @@ def read_yaml_file(filename):
 
     Usage:
 
-        # Read the file
-        d = read_yaml_file(<some_yaml_file_location_as_string>)
+        .. code-block:: python
 
-        value = d[key]
+            # Read the file
+            d = read_yaml_file(<some_yaml_file_location_as_string>)
+
+            value = d[key]
 
         """
     with open(filename) as fh:
@@ -230,8 +237,7 @@ def get_positions(vital_file, filter_dict=False):
             vit_file = "<path/to/<your_vital_file>.vit>"
 
             # Get lats, lons
-            mermaid_name, dates, latitudes, longitudes = \
-                get_positions(vit_file, filter_dict)
+            mermaid_name, dates, latitudes, longitudes = get_positions(vit_file, filter_dict)
 
     """
 
@@ -382,6 +388,82 @@ class MermaidLocations(object):
             # Plot full map
             ML.plot()
 
+    :param latitudes: 2D list with 1 row for each mermaid
+    :type latitudes: list
+    :param longitudes: 2D list with 1 row for each mermaid
+    :type longitudes: list
+    :param times: 2D list with 1 row for each mermaid
+    :type times: list
+    :param mermaid_names: List with 1 name for each mermaid
+    :type mermaid_names: list
+    :param lon_ticks: List of map longitude ticks for plotting. Make sure
+                      you have one more index than necessary.
+                      #justpythonthings
+    :type lon_ticks: list
+    :param lat_ticks: List of map latitude ticks for plotting. Make sure
+                      you have one more index than necessary.
+                      #justpythonthings
+    :type lat_ticks: list
+    :param minlon: Minimum map longitude
+    :type minlon: float or int
+    :param maxlon: Maximum map longitude
+    :type maxlon: float or int
+    :param minlat: Minimum map latitude
+    :type minlat: float or int
+    :param maxlat: Maximum map latitude
+    :type maxlat: float or int
+    :param central_longitude: Set the central longitude of the map.
+                              Important for plotting of the pacific for
+                              example.
+    :type central_longitude: float or int
+    :param begin: Datetime of float operation
+    :type begin: UTCDateTime
+    :param end: Datetime stamp of float operation
+    :type end: UTCDateTime
+    :param mermaid_markersize: Markersize for the Mermaid markers
+    :type mermaid_markersize: float or int
+    :param legend: Plot legend of map content
+    :type legend: bool
+    :param legend_cols: Number of columns in the legend. Default 1
+    :type legend_cols: int
+    :param legend_title: Some title. Default None
+    :type legend_title: str
+    :param fontsize: General fontsize for the figure
+    :type fontsize: float or int
+    :param plot_labels: Plot labels of the mermaid number onto the
+                           markers
+    :type plot_labels: bool
+    :param label_offset: Text will be offset by a some latitude.
+                         Important if you change the size of the marker
+                         since the center of the text is not on the point
+                         given in label location.
+    :type label_offset: float
+    :param markerfontsize: Fontsize for Label on Mermaid marker
+    :type markerfontsize: float or int
+    :param trajectories: Plot trajectories of the mermaids. Default
+                        `True`, but :attr:`times` has to be defined.
+    :type trajectories: bool
+    :param trajectory_width: Width of the trajectories' line plots
+    :type trajectory_width: float or int
+    :param trajectory_cmp: Colormap of the trajectories.
+    :type trajectory_cmp: str
+    :param wms: Get WMS map from a server.
+    :type wms: bool
+    :param wms_url: WMS request URL
+    :type wms_url: str
+    :param wms_layer: Name of the requested layer.
+    :type wms_layer: str
+    :param frames: If animation is wanted the frame number can be set
+                   with this kwarg.
+    :type frames: int
+    :param animation_writer: Choose what encoder to use to write the
+                             animation to file. Default is "ffmpeg",
+                             imagemagick requires a brew install on mac.
+    :type animation_writer: str
+    :param figsize: Define the figure size (Width, Height)
+    :type figsize: tuple
+    :return: MermaidLocation object.
+
 
     """
 
@@ -403,83 +485,7 @@ class MermaidLocations(object):
                 frames=100,
                 animation_writer="ffmpeg",
                 figsize=(15, 8)):
-        """
-
-        :param latitudes: 2D list with 1 row for each mermaid
-        :type latitudes: list
-        :param longitudes: 2D list with 1 row for each mermaid
-        :type longitudes: list
-        :param times: 2D list with 1 row for each mermaid
-        :type times: list
-        :param mermaid_names: List with 1 name for each mermaid
-        :type mermaid_names: list
-        :param lon_ticks: List of map longitude ticks for plotting. Make sure
-                          you have one more index than necessary.
-                          #justpythonthings
-        :type lon_ticks: list
-        :param lat_ticks: List of map latitude ticks for plotting. Make sure
-                          you have one more index than necessary.
-                          #justpythonthings
-        :type lat_ticks: list
-        :param minlon: Minimum map longitude
-        :type minlon: float or int
-        :param maxlon: Maximum map longitude
-        :type maxlon: float or int
-        :param minlat: Minimum map latitude
-        :type minlat: float or int
-        :param maxlat: Maximum map latitude
-        :type maxlat: float or int
-        :param central_longitude: Set the central longitude of the map.
-                                  Important for plotting of the pacific for
-                                  example.
-        :type central_longitude: float or int
-        :param begin: Datetime of float operation
-        :type begin: UTCDateTime
-        :param end: Datetime stamp of float operation
-        :type end: UTCDateTime
-        :param mermaid_markersize: Markersize for the Mermaid markers
-        :type mermaid_markersize: float or int
-        :param legend: Plot legend of map content
-        :type legend: bool
-        :param legend_cols: Number of columns in the legend. Default 1
-        :type legend_cols: int
-        :param legend_title: Some title. Default None
-        :type legend_title: str
-        :param fontsize: General fontsize for the figure
-        :type fontsize: float or int
-        :param plot_labels: Plot labels of the mermaid number onto the
-                               markers
-        :type plot_labels: bool
-        :param label_offset: Text will be offset by a some latitude.
-                             Important if you change the size of the marker
-                             since the center of the text is not on the point
-                             given in label location.
-        :type label_offset: float
-        :param markerfontsize: Fontsize for Label on Mermaid marker
-        :type markerfontsize: float or int
-        :param trajectories: Plot trajectories of the mermaids. Default
-                            `True`, but :attr:`times` has to be defined.
-        :type trajectories: bool
-        :param trajectory_width: Width of the trajectories' line plots
-        :type trajectory_width: float or int
-        :param trajectory_cmp: Colormap of the trajectories.
-        :type trajectory_cmp: str
-        :param wms: Get WMS map from a server.
-        :type wms: bool
-        :param wms_url: WMS request URL
-        :type wms_url: str
-        :param wms_layer: Name of the requested layer.
-        :type wms_layer: str
-        :param frames: If animation is wanted the frame number can be set
-                       with this kwarg.
-        :type frames: int
-        :param animation_writer: Choose what encoder to use to write the
-                                 animation to file. Default is "ffmpeg",
-                                 imagemagick requires a brew install on mac.
-        :type animation_writer: str
-        :param figsize: Define the figure size (Width, Height)
-        :type figsize: tuple
-        :return: MermaidLocation object.
+        """This part initializes the class.
         """
 
 
@@ -489,7 +495,7 @@ class MermaidLocations(object):
         self.times = times
         self.mermaid_names = mermaid_names
 
-        """ input data notes:
+        """input data notes:
         - markerfontsize only use as fix if autoscaling doesnt work
         - 
         """
@@ -628,11 +634,13 @@ class MermaidLocations(object):
         self.auxiliary_data.append(data_dict)
 
     def plot(self, f=None, **kwargs):
-        """Plots everything
+        """Plots everything.
+
         :param f: Filename. No plot will be displayed, but a file will be
                   generated.
-        :param kwargs: Are parsed to pyplot.savefig if `f` is defined and to
-                       plt.show if `f` is `None`"""
+        :param kwargs: Are parsed to `pyplot.savefig` if `f` is defined and to
+                         plt.show if `f` is `None`
+        """
 
         # Plot background map
         self.plot_map()
@@ -701,15 +709,14 @@ class MermaidLocations(object):
     def plot_animation(self):
         """ Plots animation of the trajectories
 
-        warning::
+        .. warning::
 
             This method only works if you have defined the times!
 
-
         The way this method works is, first all full segments to be drawn at
         each timestep are computed into lists as well as the final marker
-        positions. These are then accessed by the update() function, which
-        changes the location of the marker and adds the trajectory.
+        positions. These are then accessed by the :func:`update` function,
+        which changes the location of the marker and adds the trajectory.
 
         The update function is defined inside this function, as it has no
         meaning outside."""
@@ -831,7 +838,7 @@ class MermaidLocations(object):
         def update(i):
             """ This is the function that updates the figure. Meaning,
             The mermaid marker locations are updated, additional trajectories
-            are addad are added and the """
+            are added, and title timestamp is changed. """
             # Note the -1 index. has been set because the times are reversed
             # due to previous calculations...
             if line_collection_list[-i] is not None:
@@ -983,7 +990,7 @@ class MermaidLocations(object):
 
         .. warning::
             This method only works if you have defined the times!
-            """
+        """
 
         if self.times is None:
             raise ValueError("You can only plot trajectories if the time "
@@ -1011,8 +1018,7 @@ class MermaidLocations(object):
 
             self.ax.add_collection(lc)
 
-    def _plot_1_traj(self, _i, lat, lon, t, first_time, last_time,
-                     end_points, line_width, cmap):
+    def _plot_1_traj(self, _i, lat, lon, t, end_points):
         """This function computes one trajectory for a given set of lats,
         lons. and times, as well as the first and last time of all
         trajectories in seconds, line width, cmap.
@@ -1024,17 +1030,9 @@ class MermaidLocations(object):
         :param lon: List of longitudes corresponfing to Mermaid track
         :type lon: list
         :param t: List of times corresponfing to Mermaid track
-        :param first_time: first timestamp in list of mermaids
-        :type first_time: float
-        :param last_time: last timestamp in list of floats
-        :type last_time: float
         :param end_points: list that collects disconnecting points so that
         markers can be plotted.
         :type: list
-        :param line_width: Width of plotted trajectory
-        :type line_width: float or int
-        :param cmap: color map to plot trajectory
-        :type cmap: str
         :return: LineCollection to be plotted
 
         """
@@ -1058,7 +1056,7 @@ class MermaidLocations(object):
     @staticmethod
     def _get_segments(_i, lat, lon, end_points):
         """This function takes in lats and lons, and returns segments for a
-        LineCollection
+        LineCollection.
 
         :param _i: index for end_point list
         :type _i: int
@@ -1067,6 +1065,7 @@ class MermaidLocations(object):
         :param lon: longitudes
         :type lon: list
         :param end_points: end_points of trajectories (defining time jumps)
+        :type end_points: list
         :return: tuple with (segments, indices)
         """
 
@@ -1096,6 +1095,24 @@ class MermaidLocations(object):
     @staticmethod
     def _make_line_collection(segments, cvals, min_val, max_val, cmap,
                               line_width, zorder=100):
+        """Takes in parameters to make colorbased paths LineCollection.
+
+        :param segments: linesegments to be plotted
+        :type segments: 2D array or list
+        :param cvals: list corresponding to the segments
+        :type cvals: list
+        :param min_val: min normalization value
+        :type min_val: float
+        :param max_val: max normalization value
+        :type max_val: float
+        :param cmap: colorbar
+        :type cmap: str
+        :param line_width: width of the lineplotted.
+        :type line_width: float
+        :param zorder: plotting priority
+        :type zorder: int
+        :return:
+        """
 
         lc = LineCollection(segments, cvals,
                             cmap=plt.get_cmap(cmap),
@@ -1110,12 +1127,8 @@ class MermaidLocations(object):
 
     def plot_markers(self):
         """This function uses the data included in :class:`MermaidLocations`
-        to plot the last positions of each Mermaid. The external function
-        :func:`plot_point` is used to achieve that.
+        to plot the last positions of each Mermaid.
         """
-
-        # Mermaid marker
-        mermaid_verts = self._get_mermaid_vertices()
 
         # Plot Mermaid Locations
         for _i, (lat, lon) in enumerate(zip(self.latitudes, self.longitudes)):
@@ -1146,7 +1159,8 @@ class MermaidLocations(object):
 
     def _plot_mermaid_marker(self, lon, lat, name, **kwargs):
         """ Plot mermaid marker. Only kwargs that work for both scatter
-        plotting and text plotting are usable here!
+        plotting and text plotting are usable here! The external functions
+        :func:`plot_point` and :func:`plot_text` is used to achieve that.
 
         :param lon: longitude
         :param lat: latitude
