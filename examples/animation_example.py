@@ -90,10 +90,11 @@ ML.add_aux_data([s_lon, v_lon], [s_lat, v_lat], color="b", linewidth=2.5,
                 label="Shimizu-Valparaíso - Dec/Jan ’18/‘19")
 
 
+# ML.animate()
 
 
 # Write mp4
-# ML.animate(f="test.gif", writer="imagemagick")
-ML.animate(f="test.mp4")
-# ML.animate()
+# ML.animate(f="test.mp4")
 
+# Write gif
+ML.animate(f="test.gif", writer="imagemagick")
