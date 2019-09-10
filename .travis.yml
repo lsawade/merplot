@@ -13,7 +13,7 @@ install:
   - conda config --add channels conda-forge
   - conda update -q conda
   - conda info -a
-  - conda create -q -f environment.yml
+  - conda create -f environment.yml
   - source activate merplot
   - pip install -e .
   
