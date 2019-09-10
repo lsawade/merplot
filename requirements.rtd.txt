@@ -1,0 +1,10 @@
+numpy
+matplotlib
+obspy
+pyyaml
+
+sphinx
+sphinx_rtd_theme
+m2r
+pytest
+py
