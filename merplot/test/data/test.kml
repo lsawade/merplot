@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+<Document>
+	<name>Papeete-Papeete.kml</name>
+	<Style id="inline41">
+		<LineStyle>
+			<color>ff0000ff</color>
+			<width>2</width>
+		</LineStyle>
+		<PolyStyle>
+			<fill>0</fill>
+		</PolyStyle>
+	</Style>
+	<StyleMap id="inline21">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#inline9</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#inline41</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Style id="inline9">
+		<LineStyle>
+			<color>ff0000ff</color>
+			<width>2</width>
+		</LineStyle>
+		<PolyStyle>
+			<fill>0</fill>
+		</PolyStyle>
+	</Style>
+	<Placemark>
+		<name>Papeete-Papeete</name>
+		<styleUrl>#inline21</styleUrl>
+		<LineString>
+			<tessellate>1</tessellate>
+			<coordinates>
+				-149.5691247574971,-17.54206757345882,0 -143.9807900719819,-11.502869742594,0
+			</coordinates>
+		</LineString>
+	</Placemark>
+</Document>
+</kml>

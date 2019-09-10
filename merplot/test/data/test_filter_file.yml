@@ -1,0 +1,19 @@
+# This is a filter info yaml file for all current mermaids. As of now, this
+# file only contains the time filter list. See Mermaid 23 for multiple filter
+# windows. The filter list is loaded using the yaml module into a dictionary
+# of lists. This makes the filter file human readable and modifiable in the
+# future. Making the time_filter a list enables us to very simply choose
+# multiple windows that can be excluded.
+#
+
+# Mermaid number
+10:
+  # Time filter:
+  # structure of the time filter is a list of lists with UTCDateTimes.
+  #  [ [starttime , endtime],
+  #    [starttime , endtime],
+  #     ...                   ]
+  # The location within the time window will not be considered when reading
+  # the mermaid data.
+  time_filter: [["2018-11-19T07:43:01", "2018-12-19T07:43:01"],
+                ["2018-12-27T18:10:34", "2018-12-27T19:37:34"]]
