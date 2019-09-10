@@ -9,3 +9,5 @@ data
 .DS_Store
 build
 /merplot.egg-info
+*.gif
+*.mp4

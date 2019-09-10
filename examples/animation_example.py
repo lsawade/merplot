@@ -33,7 +33,10 @@ ML = MermaidLocations.from_vit_file(file_list,
                                     trajectory_width=6,
                                     wms=wms, wms_url=wms_url,
                                     wms_layer=wms_layer,
-                                    figsize=(30, 8), fontsize=14)
+                                    frames=500,
+                                    movie_dpi=200,
+                                    frames_per_sec=24,
+                                    figsize=(15, 8), fontsize=14)
 
 # Get paths to auxiliary data
 pp_path = os.path.join(data_path, "Papeete-Papeete.kml")
@@ -87,5 +90,10 @@ ML.add_aux_data([s_lon, v_lon], [s_lat, v_lat], color="b", linewidth=2.5,
                 label="Shimizu-Valparaíso - Dec/Jan ’18/‘19")
 
 
-# Plot
-ML.animate(f="test.mpeg", writer=60)
+
+
+# Write mp4
+# ML.animate(f="test.gif", writer="imagemagick")
+ML.animate(f="test.mp4")
+# ML.animate()
+

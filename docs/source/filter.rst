@@ -1,7 +1,7 @@
 Filter
 ======
 
-To accomodate Mermaid testing values in the `.vit` file, we need to filter
+To accommodate Mermaid testing values in the `.vit` file, we need to filter
 out certain times. This is easily done by using a `.yml` file. `.yml` files
 ar easy to read and easy to modify.
 
@@ -31,3 +31,8 @@ be a list of values, such that multiple windows can be filtered out. The
 filter is loaded as a part of the file loading process. I decided for this
 type of setup, because it is very simple to possible add other filters in the
 future that can also be specified in the same `.yml` file.
+
+The filter is called by :func:`merplot.mermaid_plot.MermaidLocations
+.from_vit_file` and the filter is used to exclude certain dates in the
+mermaid tracks.
+

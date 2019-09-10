@@ -388,88 +388,11 @@ class MermaidLocations(object):
             # Plot full map
             ML.plot()
 
-    :param latitudes: 2D list with 1 row for each mermaid
-    :type latitudes: list
-    :param longitudes: 2D list with 1 row for each mermaid
-    :type longitudes: list
-    :param times: 2D list with 1 row for each mermaid
-    :type times: list
-    :param mermaid_names: List with 1 name for each mermaid
-    :type mermaid_names: list
-    :param lon_ticks: List of map longitude ticks for plotting. Make sure
-                      you have one more index than necessary.
-                      #justpythonthings
-    :type lon_ticks: list
-    :param lat_ticks: List of map latitude ticks for plotting. Make sure
-                      you have one more index than necessary.
-                      #justpythonthings
-    :type lat_ticks: list
-    :param minlon: Minimum map longitude
-    :type minlon: float or int
-    :param maxlon: Maximum map longitude
-    :type maxlon: float or int
-    :param minlat: Minimum map latitude
-    :type minlat: float or int
-    :param maxlat: Maximum map latitude
-    :type maxlat: float or int
-    :param central_longitude: Set the central longitude of the map.
-                              Important for plotting of the pacific for
-                              example.
-    :type central_longitude: float or int
-    :param begin: Datetime of float operation
-    :type begin: UTCDateTime
-    :param end: Datetime stamp of float operation
-    :type end: UTCDateTime
-    :param mermaid_markersize: Markersize for the Mermaid markers
-    :type mermaid_markersize: float or int
-    :param legend: Plot legend of map content
-    :type legend: bool
-    :param legend_cols: Number of columns in the legend. Default 1
-    :type legend_cols: int
-    :param legend_title: Some title. Default None
-    :type legend_title: str
-    :param fontsize: General fontsize for the figure
-    :type fontsize: float or int
-    :param plot_labels: Plot labels of the mermaid number onto the
-                           markers
-    :type plot_labels: bool
-    :param label_offset: Text will be offset by a some latitude.
-                         Important if you change the size of the marker
-                         since the center of the text is not on the point
-                         given in label location.
-    :type label_offset: float
-    :param markerfontsize: Fontsize for Label on Mermaid marker
-    :type markerfontsize: float or int
-    :param trajectories: Plot trajectories of the mermaids. Default
-                        `True`, but :attr:`times` has to be defined.
-    :type trajectories: bool
-    :param trajectory_width: Width of the trajectories' line plots
-    :type trajectory_width: float or int
-    :param trajectory_cmp: Colormap of the trajectories.
-    :type trajectory_cmp: str
-    :param wms: Get WMS map from a server.
-    :type wms: bool
-    :param wms_url: WMS request URL
-    :type wms_url: str
-    :param wms_layer: Name of the requested layer.
-    :type wms_layer: str
-    :param frames: If animation is wanted the frame number can be set
-                   with this kwarg.
-    :type frames: int
-    :param animation_writer: Choose what encoder to use to write the
-                             animation to file. Default is "ffmpeg",
-                             imagemagick requires a brew install on mac.
-    :type animation_writer: str
-    :param figsize: Define the figure size (Width, Height)
-    :type figsize: tuple
-    :return: MermaidLocation object.
-
-
     """
 
     def __init__(self, latitudes, longitudes, times=None, mermaid_names=None,
-                lon_ticks=[160.0, 180.0, -180.0, -160.0, -140.0, -120.0,
-                           -100.0],
+                lon_ticks=[160.0, 180.0, -180.0, -160.0,
+                           -140.0, -120.0, -100.0],
                 lat_ticks=[-60, -40.0, -20.0, 0.0, 20.0],
                 minlon=160.0, maxlon=260.0, minlat=-42.5, maxlat=5.0,
                 central_longitude=180.0,
@@ -483,11 +406,90 @@ class MermaidLocations(object):
                 trajectory_cmp="gist_heat",
                 wms=False, wms_url=None, wms_layer=None,
                 frames=100,
+                frames_per_sec=24,
                 animation_writer="ffmpeg",
+                movie_dpi=150,
                 figsize=(15, 8)):
         """This part initializes the class.
-        """
 
+        :param latitudes: 2D list with 1 row for each mermaid
+        :type latitudes: list
+        :param longitudes: 2D list with 1 row for each mermaid
+        :type longitudes: list
+        :param times: 2D list with 1 row for each mermaid
+        :type times: list
+        :param mermaid_names: List with 1 name for each mermaid
+        :type mermaid_names: list
+        :param lon_ticks: List of map longitude ticks for plotting. Make sure
+                          you have one more index than necessary.
+                          #justpythonthings
+        :type lon_ticks: list
+        :param lat_ticks: List of map latitude ticks for plotting. Make sure
+                          you have one more index than necessary.
+                          #justpythonthings
+        :type lat_ticks: list
+        :param minlon: Minimum map longitude
+        :type minlon: float or int
+        :param maxlon: Maximum map longitude
+        :type maxlon: float or int
+        :param minlat: Minimum map latitude
+        :type minlat: float or int
+        :param maxlat: Maximum map latitude
+        :type maxlat: float or int
+        :param central_longitude: Set the central longitude of the map.
+                                  Important for plotting of the pacific for
+                                  example.
+        :type central_longitude: float or int
+        :param begin: Datetime of float operation
+        :type begin: UTCDateTime
+        :param end: Datetime stamp of float operation
+        :type end: UTCDateTime
+        :param mermaid_markersize: Markersize for the Mermaid markers
+        :type mermaid_markersize: float or int
+        :param legend: Plot legend of map content
+        :type legend: bool
+        :param legend_cols: Number of columns in the legend. Default 1
+        :type legend_cols: int
+        :param legend_title: Some title. Default None
+        :type legend_title: str
+        :param fontsize: General fontsize for the figure
+        :type fontsize: float or int
+        :param plot_labels: Plot labels of the mermaid number onto the
+                               markers
+        :type plot_labels: bool
+        :param label_offset: Text will be offset by a some latitude.
+                             Important if you change the size of the marker
+                             since the center of the text is not on the point
+                             given in label location.
+        :type label_offset: float
+        :param markerfontsize: Fontsize for Label on Mermaid marker
+        :type markerfontsize: float or int
+        :param trajectories: Plot trajectories of the mermaids. Default
+                            `True`, but :attr:`times` has to be defined.
+        :type trajectories: bool
+        :param trajectory_width: Width of the trajectories' line plots
+        :type trajectory_width: float or int
+        :param trajectory_cmp: Colormap of the trajectories.
+        :type trajectory_cmp: str
+        :param wms: Get WMS map from a server.
+        :type wms: bool
+        :param wms_url: WMS request URL
+        :type wms_url: str
+        :param wms_layer: Name of the requested layer.
+        :type wms_layer: str
+        :param frames: If animation is wanted the frame number can be set
+                       with this kwarg.
+        :type frames: int
+        :param animation_writer: Choose what encoder to use to write the
+                                 animation to file. Default is "ffmpeg",
+                                 imagemagick requires a brew install on mac.
+        :type animation_writer: str
+        :param movie_dpi: The dpi with which the movie is exported
+        :type movie_dpi: int
+        :param figsize: Define the figure size (Width, Height)
+        :type figsize: tuple
+        :return: MermaidLocation object.
+        """
 
         # Main Data
         self.latitudes = latitudes
@@ -495,12 +497,7 @@ class MermaidLocations(object):
         self.times = times
         self.mermaid_names = mermaid_names
 
-        """input data notes:
-        - markerfontsize only use as fix if autoscaling doesnt work
-        - 
-        """
         ### Plot paramaters
-
         # Figure size
         self.figsize = figsize
 
@@ -532,7 +529,9 @@ class MermaidLocations(object):
 
         # Animation settings
         self.frames = frames
+        self.frames_per_sec = frames_per_sec
         self.writer = animation_writer
+        self.movie_dpi = movie_dpi
 
         # WMS settings
         self.wms = wms
@@ -667,8 +666,13 @@ class MermaidLocations(object):
             # Show stuff
             plt.show(block=True)
 
-    def animate(self, f=None, **kwargs):
+    def animate(self, f=None, writer=None, **kwargs):
         """Animates the trajectories of the Mermaids...
+
+        :param f: output file name
+        :type f: str
+        :param writer: name of movie writer. Overwrites class config.
+        :type writer: str
 
         """
 
@@ -690,21 +694,29 @@ class MermaidLocations(object):
         # Plot animation
         ani = self.plot_animation()
 
-
         if f is None:
             # Show everything
             plt.show()
         else:
-            # Set up formatting for the movie files
-            if self.writer == "ffmpeg":
-                Writer = animation.writers['ffmpeg']
-                writer = Writer(fps=60, metadata=dict(artist='Me'),
-                                bitrate=1800)
-            elif self.writer == "ffmpeg":
-                Writer = animation.writers['imagemagick']
-                writer = Writer(fps=60, metadata=dict(artist='Me'))
 
-            ani.save(f, writer=writer)
+            if writer is None:
+                # Set up formatting for the movie files
+                if self.writer == "ffmpeg":
+                    Writer = animation.writers['ffmpeg']
+                    writer = Writer(fps=self.frames_per_sec,
+                                    metadata=dict(artist='Me'),
+                                    bitrate=1800)
+                elif self.writer == "ffmpeg":
+                    Writer = animation.writers['imagemagick']
+                    writer = Writer(fps=self.frames_per_sec,
+                                    metadata=dict(artist='Me'))
+            else:
+                Writer = animation.writers[writer]
+                writer = Writer(fps=self.frames_per_sec,
+                                metadata=dict(artist='Me'),
+                                bitrate=1800)
+
+            ani.save(f, writer=writer,  dpi=self.movie_dpi,)
 
     def plot_animation(self):
         """ Plots animation of the trajectories
@@ -876,7 +888,8 @@ class MermaidLocations(object):
         # Create animation is activated outside this function via plt.show()
         ani = animation.FuncAnimation(self.fig, update,
                                       frames=np.arange(self.frames)+1,
-                                      interval=1, repeat=False, blit=True,
+                                      interval=1, repeat=False,
+                                      blit=True,
                                       init_func=lambda:
                                       [x for x in line_collection_list
                                        if x is not None]

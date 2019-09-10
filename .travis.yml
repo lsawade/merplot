@@ -13,9 +13,8 @@ install:
   - conda config --add channels conda-forge
   - conda update -q conda
   - conda info -a
-  - conda create -q -n test-env python=$TRAVIS_PYTHON_VERSION
-  - source activate test-env
-  - conda install --file requirements.txt
+  - conda create -q -f environment.yml
+  - source activate merplot
   - pip install -e .
   
 # command to run tests

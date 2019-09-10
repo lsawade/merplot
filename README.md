@@ -1,7 +1,8 @@
 # Mermaid plot utility
 
 Hi! This is a simple and more or less short module to plot Mermaid float 
-locations and trajectories on a map.
+locations and trajectories on a map. The full documentation can be found is 
+hosted by readthedocs ([merplot](http://merplot.rtfd.io/)).
 
 ## Installation
 
@@ -43,7 +44,7 @@ pip install -e .
 
 Then, everything should be installed and working.
 
-## Usage
+## Basic Usage
 
 There are two ways of using the module. You can either use the python 
 "binaries" in the `bin` directory or you may use the module by itself -- 
