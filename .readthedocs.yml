@@ -21,7 +21,7 @@ python:
    version: 3.7
    install:
       - requirements: docs/requirements.txt
-      - method: conda
+      - method: pip
         path: .
       - method: pip
    system_packages: true
