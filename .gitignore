@@ -10,4 +10,5 @@ data
 build
 /merplot.egg-info
 *.gif
+*.jpg
 *.mp4
