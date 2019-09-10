@@ -17,7 +17,7 @@ sys.path.append(data_path)
 file_list = glob.glob(os.path.join(data_path, "*.vit"))
 
 # WMS setup: Set to true of you have internet and want a high res map
-wms = False
+wms = True
 wms_url = 'https://ahocevar.com/geoserver/wms'
 wms_layer = 'ne:NE1_HR_LC_SR_W_DR'
 
@@ -46,11 +46,11 @@ np_lat, np_lon = get_coordinates_from_kml_path(np_path)
 
 # Add ship paths
 ML.add_aux_data(np_lon, np_lat, color="y", linewidth=2.5,
-            label="Nouméa-Pape'ete - Jun/Jul '18")
+                label="Nouméa-Pape'ete - Jun/Jul '18")
 ML.add_aux_data(pp_lon, pp_lat, color="r", linewidth=2.5,
-            label="Pape'ete-Pape'ete - Aug '18")
+                label="Pape'ete-Pape'ete - Aug '18")
 ML.add_aux_data(pn_lon, pn_lat, color="g", linewidth=2.5,
-            label="Pape'ete-Nouméa - Aug '19")
+                label="Pape'ete-Nouméa - Aug '19")
 
 # Pape'ete
 p_lon = -149.5585
@@ -85,7 +85,7 @@ ML.add_aux_data(v_lon, v_lat, linestyle="None", marker="o", markersize=7,
 ML.add_aux_data([s_lon, v_lon], [s_lat, v_lat], color="b", linewidth=2.5,
             label="Shimizu-Valparaíso - Dec/Jan ’18/‘19")
 
-# Plot
+# Plot the map
 ML.plot()
 
 

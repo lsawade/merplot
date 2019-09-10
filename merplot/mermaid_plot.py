@@ -706,10 +706,6 @@ class MermaidLocations(object):
                     writer = Writer(fps=self.frames_per_sec,
                                     metadata=dict(artist='Me'),
                                     bitrate=1800)
-                elif self.writer == "ffmpeg":
-                    Writer = animation.writers['imagemagick']
-                    writer = Writer(fps=self.frames_per_sec,
-                                    metadata=dict(artist='Me'))
             else:
                 Writer = animation.writers[writer]
                 writer = Writer(fps=self.frames_per_sec,
@@ -1023,11 +1019,7 @@ class MermaidLocations(object):
 
             # Create line collection
             lc = self._plot_1_traj(_i, lat, lon, t,
-                                   self.first_time,
-                                   self.last_time,
-                                   self.end_points,
-                                   self.trajectory_width,
-                                   self.trajectory_cmap)
+                                   self.end_points)
 
             self.ax.add_collection(lc)
 
@@ -1217,14 +1209,7 @@ class MermaidLocations(object):
 
         # Calling function to plot one trajectory.
         lc = self._plot_1_traj(0, self.latitudes[0], self.longitudes[0],
-                               self.times_s[0],
-                               self.first_time,
-                               self.last_time,
-                               self.end_points,
-                               self.trajectory_width,
-                               self.trajectory_cmap)
-
-
+                               self.times_s[0], self.end_points)
 
         # Get max time extent
         maxt = self.last_time - self.first_time
