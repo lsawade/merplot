@@ -41,15 +41,16 @@ Afterwards, you can run the following example.
 .. include:: ../../examples/static_example.py
     :code: python
 
-The example output using :module:`cartopy`'s background map is shown below.
+The example output using `cartopy`'s background map is shown below.
 
 .. raw:: html
 
-    <video width="320" height="240" autoplay>
-         <source src="movie.mp4" type="video/mp4">
-  <source src="movie.ogg" type="video/ogg">
-Your browser does not support the video tag.
-</video>
+    <div style="position: relative; padding-bottom: 56.25%; height: 0;
+                        overflow: hidden; max-width: 100%; height: auto;">
+        <video autoplay>
+             <source src="_static/figures/mermaid.mp4" type="mp4">
+        </video>
+    </div>
 
 See :download:`this example script <../../examples/animation_example.py>`
 
