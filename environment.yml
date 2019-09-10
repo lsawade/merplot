@@ -1,0 +1,16 @@
+name: merplot
+channels:
+  - conda-forge
+dependencies:
+  - numpy
+  - matplotlib
+  - obspy
+  - cartopy
+  - pip
+  - pip:
+    - pyyaml
+    - sphinx
+    - sphinx_rtd_theme
+    - m2r
+    - pytest
+    - py

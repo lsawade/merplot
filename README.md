@@ -26,15 +26,16 @@ rest of the computer is not "disturbed".
 
 Next, the we have to activate the environment and download dependencies.
 
-Activation:
+Activation & Installation
 ```bash
-conda activate merplot
-```
+# Change directory to the merplot directory:
+cd <merplot_dir>
 
-to install everything you need, simply enter...
-```bash
-# CHange directory to the merplot directory:
-conda install --file requirements.txt
+# Create environemtn and install dependencies
+conda env create -f environment.yml
+
+# Activate environment
+conda activate merplot # the name is defined in the installation name
 
 # Followed by
 pip install -e .
