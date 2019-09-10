@@ -13,6 +13,10 @@ plotted using the following example (link to download script at the bottom.)
 .. include:: ../../examples/static_example.py
     :code: python
 
+The results is shown below:
+
+.. image:: _static/figures/static_mermaid.jpg
+
 
 :download:`this example script <../../examples/static_example.py>`
 
@@ -43,14 +47,8 @@ Afterwards, you can run the following example.
 
 The example output using `cartopy`'s background map is shown below.
 
-.. raw:: html
+.. image:: _static/figures/mermaid.mp4
 
-    <div style="position: relative; padding-bottom: 56.25%; height: 0;
-                        overflow: hidden; max-width: 100%; height: auto;">
-        <video autoplay>
-             <source src="_static/figures/mermaid.mp4" type="mp4">
-        </video>
-    </div>
 
 See :download:`this example script <../../examples/animation_example.py>`
 
@@ -58,4 +56,33 @@ See :download:`this example script <../../examples/animation_example.py>`
 Binaries
 --------
 
-There are a few binaries that were created to make the
+There are a few binaries that were created to make it easy to plot stuff from
+the command line. Note that they include loading of files that are in the
+`data` directory, such as the deployment routes in `.kml` format. The above
+example do the same!
+
+### Simple Map
+```bash
+$ ./bin/plot_mermaid_locations.py <.vit files>
+```
+
+If you use the data from the data directory and are in the `merplot` directory:
+
+```bash
+$ ./bin/plot_mermaid_locations.py data/*.vit
+```
+
+### Animated Map
+
+```bash
+$ ./bin/animate_trajectories.py <.vit files>
+```
+
+If you use the data from the data directory and are in the `merplot` directory:
+
+```bash
+$ ./bin/animate_trajectories.py data/*.vit
+```
+
+
+Happy plotting!
